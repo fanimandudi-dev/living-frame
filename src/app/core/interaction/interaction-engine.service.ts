@@ -26,9 +26,11 @@ type TransitionListener = (from: FrameState, to: FrameState) => void;
  * dépendance DOM : il est testable unitairement avec un adaptateur factice
  * et des timers virtuels (tests TEST-01 / TEST-02).
  *
- * Politiques V0 validées (cahier des charges §17) :
- *   - « grâce »    : un départ pendant ENGAGED/HOLD n'interrompt pas le cycle (T7) ;
- *   - « mono-passe »: un nouveau cycle exige une absence confirmée (réarmement).
+ * Politiques V0 (D1, amendée le 30/09/2026 — « présence tenue ») :
+ *   - l'œuvre reste animée (HOLD) TANT QUE la personne est présente ;
+ *   - le message tient au moins holdDurationMs (plancher minimal, pas une limite) ;
+ *   - retour à l'œuvre initiale au départ confirmé (absence stable) ;
+ *   - « mono-passe » : un nouveau cycle exige une absence confirmée.
  */
 @Injectable({ providedIn: 'root' })
 export class InteractionEngineService {
@@ -60,6 +62,9 @@ export class InteractionEngineService {
 
   /** Repère d'entrée en APPROACH, pour mesurer engageDelayMs. */
   private approachEnteredAt = 0;
+
+  /** Repère d'entrée en HOLD, pour le plancher minimal du message. */
+  private holdEnteredAt = 0;
 
   // ----------------------------------------------------------- cycle de vie
   /**
@@ -143,9 +148,7 @@ export class InteractionEngineService {
     const presenceConfirmed =
       this.presentRunStart !== null &&
       now - this.presentRunStart >= this.timings.presenceConfirmMs;
-    const absenceConfirmed =
-      this.absentRunStart !== null &&
-      now - this.absentRunStart >= this.timings.absenceConfirmMs;
+    const absenceConfirmed = this.isAbsenceConfirmed(now);
 
     switch (this._state()) {
       case 'IDLE':
@@ -175,12 +178,20 @@ export class InteractionEngineService {
 
       case 'ENGAGED':
         // T6 : le timer de transition mène vers HOLD.
-        // T7 — grâce : un départ n'interrompt pas le cycle.
+        // Un départ pendant la transformation n'interrompt pas : elle se
+        // termine (≤ engageTransitionMs), puis T8 s'applique dans HOLD.
         break;
 
       case 'HOLD':
-        // T9 : le timer de durée mène vers RESET.
-        // T7 — grâce : idem.
+        // T8 — départ confirmé après le plancher minimal : retour immédiat.
+        if (
+          absenceConfirmed &&
+          now - this.holdEnteredAt >= this.timings.holdDurationMs
+        ) {
+          this.setState('RESET', now);
+        }
+        // T9 — plancher écoulé mais personne toujours là : on reste en HOLD
+        // (l'œuvre reste animée tant que la personne la regarde).
         break;
 
       case 'RESET':
@@ -218,7 +229,15 @@ export class InteractionEngineService {
         this.schedule(this.timings.engageTransitionMs, () => this.setState('HOLD')); // T6
         break;
       case 'HOLD':
-        this.schedule(this.timings.holdDurationMs, () => this.setState('RESET')); // T9
+        this.holdEnteredAt = now;
+        // Plancher minimal du message. À son expiration : si la personne est
+        // déjà partie (absence confirmée) → RESET ; sinon on reste en HOLD —
+        // son départ sera traité par T8 à l'échantillon suivant.
+        this.schedule(this.timings.holdDurationMs, () => {
+          if (this.isAbsenceConfirmed(performance.now())) {
+            this.setState('RESET');
+          }
+        });
         break;
       case 'RESET':
         this.schedule(this.timings.resetDelayMs, () => this.setState('IDLE')); // T10
@@ -226,12 +245,17 @@ export class InteractionEngineService {
     }
   }
 
-  /** Réarme la machine si l'absence est confirmée depuis assez longtemps. */
-  private maybeArm(now: number): void {
-    if (
+  /** Absence confirmée à l'instant donné (anti-rebond). */
+  private isAbsenceConfirmed(now: number): boolean {
+    return (
       this.absentRunStart !== null &&
       now - this.absentRunStart >= this.timings.absenceConfirmMs
-    ) {
+    );
+  }
+
+  /** Réarme la machine si l'absence est confirmée depuis assez longtemps. */
+  private maybeArm(now: number): void {
+    if (this.isAbsenceConfirmed(now)) {
       this._armed.set(true);
     }
   }

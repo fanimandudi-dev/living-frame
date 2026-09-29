@@ -251,8 +251,8 @@ Priorités MoSCoW : **M** = indispensable au V0, **S** = souhaitable, **C** = op
 ### SCU-02 — Visiteur : passage rapide
 Une personne traverse le champ à distance, brièvement. La présence n'est jamais confirmée. **Résultat** : le cadre reste en IDLE, aucun scintillement.
 
-### SCU-03 — Visiteur : présence prolongée
-Après un cycle complet, la personne reste devant le cadre. **Résultat** : l'œuvre reste dans son état initial ; un nouveau cycle ne démarre qu'après absence confirmée puis retour (politique mono-passe — décision D1).
+### SCU-03 — Visiteur : présence prolongée *(amendé le 30/09/2026)*
+La personne reste devant le cadre à contempler. **Résultat** : l'œuvre **reste animée** (message visible) tant qu'elle est présente ; elle revient à l'œuvre initiale quand la personne s'éloigne (absence confirmée). Un nouveau cycle exige ensuite un départ confirmé puis une nouvelle approche (mono-passe).
 
 ### SCU-04 — Organisateur : préparation de l'événement
 1. Ouvre `/studio`.
@@ -397,3 +397,5 @@ Mode avion activé après installation. **Résultat** : cycle complet fonctionne
 *Décisions mineures (tranchées par défaut, modifiables sans impact) : garder le nom `ScenarioEngineService` pour le gestionnaire de configuration (contenu volontairement mince en V0) ; champs date/thème de l'événement stockés mais non affichés dans le Frame (réservés au Studio / au message par défaut) ; Angular v22 figé en Phase 2.*
 
 **Résultat de la validation (29/09/2026)** : D1 = **grâce + mono-passe** · D2 = **détection de visage (BlazeFace short-range)** · D3 = **proximité + délai** · D4 = documents validés en l'état. → Phase 2 lancée.
+
+**Amandement D1-bis (30/09/2026) — « présence tenue »** : constaté sur le prototype, un retour à l'œuvre initiale *pendant que le visiteur regarde* casse l'illusion. Désormais : le message persiste **tant que la personne est présente** ; `holdDurationMs` devient un **plancher minimal** (plus une limite) ; le retour se fait au **départ confirmé**. Le mono-passe est conservé. Table de transitions mise à jour : `PHASE-1-architecture.md` §6.4 (T7/T8/T9).

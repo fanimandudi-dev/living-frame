@@ -8,10 +8,10 @@ import type { ScriptStep } from './scripted-detector.service';
  * Trace attendue avec ces valeurs :
  *   t+0,8 s  entrée (FAR)      → présence confirmée à ~1,4 s → APPROACH
  *   t+2,6 s  approche (NEAR)   → ENGAGED (délai + proximité réunis)
- *   t+4,6 s  HOLD              → message visible
- *   t+9,6 s  RESET             → fondu de retour
- *   t+11,6 s IDLE              → personne encore là : pas de réarmement (mono-passe)
- *   t+14 s   départ            → absence confirmée ~15,2 s → réarmement
+ *   t+5 s    HOLD              → message visible (plancher minimal 5 s)
+ *   t+14 s   départ            → le message a persisté tant que la personne était là
+ *   t+15,2 s RESET             → absence confirmée → fondu de retour
+ *   t+17,2 s IDLE              → réarmement, puis le script reboucle
  *
  * Utilisé par /preview (lecture automatique) et /frame?demo=1.
  */

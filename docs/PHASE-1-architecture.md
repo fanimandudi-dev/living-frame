@@ -286,7 +286,7 @@ export interface FrameConfig {
 | **IDLE** | Aucune présence confirmée | Œuvre initiale seule, opacité engagée = 0 | — |
 | **APPROACH** | Présengement | Fondu **partiel** vers l'œuvre engagée, intensité liée à la distance (FAR ≈ 0.25 / NEAR ≈ 0.55 / VERY_NEAR ≈ 0.85) | Entrée : démarre `T_ENGAGE` |
 | **ENGAGED** | Engagement (proche + délai écoulé — décision D3) | Transformation complète (opacité → 1) + le message apparaît en fondu retardé (~800 ms) | Entrée : démarre `T_TRANSITION` |
-| **HOLD** | Phase stable du message | Message visible, œuvre engagée | Entrée : démarre `T_HOLD` |
+| **HOLD** | Phase stable du message — **tant que la personne est présente** | Message visible, œuvre engagée | Entrée : démarre `T_HOLD` (plancher minimal) |
 | **RESET** | Retour | Fondu de retour vers l'œuvre initiale, message disparaît | Entrée : démarre `T_RESET` |
 
 ### 6.2 Événements et timers
@@ -315,9 +315,9 @@ export interface FrameConfig {
 | T4 | APPROACH | échantillon | délai écoulé mais distance = FAR | — (attend la proximité ; l'œuvre « sent » la présence, sans plus) | APPROACH |
 | T5 | APPROACH | ABSENCE_CONFIRMÉE | — | stop `T_ENGAGE`, démarre `T_RESET` | RESET |
 | T6 | ENGAGED | `T_TRANSITION` écoulé | — | démarre `T_HOLD` | HOLD |
-| T7 | ENGAGED | ABSENCE_CONFIRMÉE | politique « grâce » (D1) | — (le cycle se termine de lui-même) | ENGAGED |
-| T8 | ENGAGED / HOLD | ABSENCE_CONFIRMÉE | politique « coupe » (D1) | stop timers, démarre `T_RESET` | RESET |
-| T9 | HOLD | `T_HOLD` écoulé | — | démarre `T_RESET` | RESET |
+| T7 | HOLD | ABSENCE_CONFIRMÉE | plancher `holdDurationMs` non écoulé | — (le message tient sa durée minimale) | HOLD |
+| T8 | HOLD | ABSENCE_CONFIRMÉE | plancher `holdDurationMs` écoulé | démarre `T_RESET` | RESET |
+| T9 | HOLD | `T_HOLD` écoulé | personne encore présente | — (l'œuvre reste animée tant qu'on la regarde) | HOLD |
 | T10 | RESET | `T_RESET` écoulé | — | si absence confirmée depuis ≥ `absenceConfirmMs` → `armed ← true` | IDLE |
 | T11 | RESET | échantillon présent | — | — (on termine le fondu ; pas de re-déclenchement en plein retour) | RESET |
 | T12 | tous | `forceState(s)` | mode simulation uniquement | efface tous les timers, applique `s` et ses timers d'entrée | `s` |
@@ -339,23 +339,23 @@ export interface FrameConfig {
      ▲                                          │        ▲            │(transfo.│
      │                                          │        │            │ + msg)  │
      │                                     ABSENCE_CONFIRMÉE          └─────────┘
-     │                                          │        │(grâce: rien)   │
+     │                                          │        │(départ différé)   │
      │                                          ▼        │                ▼ fin T_TRANSITION
      │                                     ┌────────┐    │           ┌─────────┐
      │  fin T_RESET                    ┌───►│ RESET  │    │           │  HOLD   │
      │  (fondu retour,                 │    │(fondu  │◄───┼───────────│(message │
-     │   re-armement)                  └────│ retour)│    │(coupe)    │ persiste)│
+     │   re-armement)                  └────│ retour)│    │(T8 : départ)    │ persiste)│
      └───────────────────────────────────────└────────┘    │           └─────────┘
                                             ▲              │                │ fin T_HOLD
                                             └──────────────┴────────────────┘
-                                              (ABSENCE_CONFIRMÉE selon politique, ou fin de durée)
+                                              (T8 : départ confirmé après plancher — sinon reste en HOLD tant que présente)
 ```
 
 ### 6.6 Politiques configurables (décisions D1/D3 du cahier des charges)
 
 | Politique | Options | Défaut proposé |
 |-----------|---------|----------------|
-| Fin de cycle si départ pendant ENGAGED/HOLD | `grace` (le cycle se termine) / `cut` (RESET immédiat gracieux) | `grace` |
+| Fin de cycle si départ pendant ENGAGED/HOLD | `plancher` (durée minimale tenue) puis RESET au départ confirmé | **présence tenue** (amendement D1-bis, 30/09/2026) |
 | Ré-armement | mono-passe (nouveau cycle après absence confirmée) / boucle tant que présence | mono-passe |
 | Condition d'ENGAGED | proximité NEAR+ maintenue + `engageDelayMs` / délai seul | proximité + délai |
 

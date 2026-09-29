@@ -75,7 +75,7 @@ describe('InteractionEngineService', () => {
     }
   }
 
-  it('TEST-01 — cycle nominal complet, dans l’ordre et les temps impartis', () => {
+  it('TEST-01 — cycle nominal : animée tant que la personne regarde, retour à son départ', () => {
     const trace: string[] = [];
     engine.onTransition((from, to) => trace.push(`${from}>${to}`));
 
@@ -94,22 +94,21 @@ describe('InteractionEngineService', () => {
     vi.advanceTimersByTime(2000);
     expect(engine.state()).toBe('HOLD');
 
-    // Durée du message (5000 ms) → RESET (T9) — grâce : personne toujours là (T7)
-    vi.advanceTimersByTime(5000);
-    expect(engine.state()).toBe('RESET');
+    // La personne RESTE : le message persiste bien au-delà du plancher (5 s).
+    for (let i = 0; i < 14; i++) {
+      vi.advanceTimersByTime(500);
+      detector.emit(true, 'NEAR');
+    }
+    expect(engine.state()).toBe('HOLD');
 
-    // Fondu de retour (2000 ms) → IDLE (T10)
-    vi.advanceTimersByTime(2000);
-    expect(engine.state()).toBe('IDLE');
-
-    // Mono-passe : la personne n'est jamais partie → pas de réarmement
-    expect(engine.armed()).toBe(false);
-
-    // Départ : absence confirmée (1200 ms) → réarmement
+    // Elle s'en va : absence confirmée (1200 ms) → RESET (T8), puis IDLE.
     for (let i = 0; i < 5; i++) {
       vi.advanceTimersByTime(300);
       detector.emit(false, null);
     }
+    expect(engine.state()).toBe('RESET');
+    vi.advanceTimersByTime(2000);
+    expect(engine.state()).toBe('IDLE');
     expect(engine.armed()).toBe(true);
 
     expect(trace.join(' ')).toBe(
@@ -127,24 +126,21 @@ describe('InteractionEngineService', () => {
     expect(engine.armed()).toBe(true);
   });
 
-  it('T2 — mono-passe : après un cycle, une présence continue ne relance rien', () => {
+  it('T2 — présence maintenue : l’œuvre reste en HOLD, pas de boucle mécanique', () => {
     personArrives('NEAR');
     for (let i = 0; i < 4; i++) {
       vi.advanceTimersByTime(300);
       detector.emit(true, 'NEAR');
     }
     vi.advanceTimersByTime(2000); // → HOLD
-    vi.advanceTimersByTime(5000); // → RESET
-    vi.advanceTimersByTime(2000); // → IDLE
-    expect(engine.state()).toBe('IDLE');
-    expect(engine.armed()).toBe(false);
 
-    // La personne reste et revient « pour voir » : le tableau reste au repos.
-    for (let i = 0; i < 10; i++) {
-      vi.advanceTimersByTime(300);
+    // La personne contemple longtemps : l'œuvre reste animée, sans rejouer.
+    for (let i = 0; i < 20; i++) {
+      vi.advanceTimersByTime(500);
       detector.emit(true, 'VERY_NEAR');
     }
-    expect(engine.state()).toBe('IDLE');
+    expect(engine.state()).toBe('HOLD');
+    expect(engine.armed()).toBe(false); // cycle consommé (mono-passe)
   });
 
   it('T5 — départ pendant APPROACH → RESET puis IDLE, réarmé', () => {
@@ -180,24 +176,47 @@ describe('InteractionEngineService', () => {
     expect(engine.state()).toBe('ENGAGED');
   });
 
-  it('T7 — grâce : un départ pendant HOLD n’interrompt pas le cycle', () => {
+  it('T7 — plancher : départ immédiat → le message tient sa durée minimale', () => {
     personArrives('NEAR');
     for (let i = 0; i < 4; i++) {
       vi.advanceTimersByTime(300);
       detector.emit(true, 'NEAR');
     }
-    vi.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000); // → HOLD (t = 4100)
     expect(engine.state()).toBe('HOLD');
 
-    // La personne part pendant HOLD : absence confirmée, mais grâce.
+    // Elle part aussitôt : absence confirmée avant le plancher (5000 ms).
     for (let i = 0; i < 5; i++) {
       vi.advanceTimersByTime(300);
       detector.emit(false, null);
     }
+    expect(engine.state()).toBe('HOLD'); // plancher non écoulé : le message tient
+
+    // Le plancher expire : absence confirmée → RESET.
+    vi.advanceTimersByTime(3800); // → t = 9100
+    expect(engine.state()).toBe('RESET');
+    vi.advanceTimersByTime(2000);
+    expect(engine.state()).toBe('IDLE');
+    expect(engine.armed()).toBe(true);
+  });
+
+  it('T8 — départ confirmé après le plancher → RESET immédiat', () => {
+    personArrives('NEAR');
+    for (let i = 0; i < 4; i++) {
+      vi.advanceTimersByTime(300);
+      detector.emit(true, 'NEAR');
+    }
+    vi.advanceTimersByTime(2000); // → HOLD (t = 4100)
+    for (let i = 0; i < 10; i++) {
+      vi.advanceTimersByTime(500);
+      detector.emit(true, 'NEAR');
+    } // t = 9100 : plancher écoulé, personne toujours là
     expect(engine.state()).toBe('HOLD');
 
-    // Le cycle se termine de lui-même.
-    vi.advanceTimersByTime(3500);
+    for (let i = 0; i < 5; i++) {
+      vi.advanceTimersByTime(300);
+      detector.emit(false, null);
+    } // absence confirmée à t = 10300 → RESET immédiat
     expect(engine.state()).toBe('RESET');
     vi.advanceTimersByTime(2000);
     expect(engine.state()).toBe('IDLE');
@@ -281,7 +300,11 @@ describe('InteractionEngineService', () => {
     vi.advanceTimersByTime(2000);
     expect(engine.state()).toBe('HOLD');
 
-    vi.advanceTimersByTime(100); // 5000 ms par défaut — 100 ms suffisent désormais
+    // Plancher réduit à 100 ms : au départ confirmé, RESET immédiat.
+    for (let i = 0; i < 5; i++) {
+      vi.advanceTimersByTime(300);
+      detector.emit(false, null);
+    }
     expect(engine.state()).toBe('RESET');
   });
 

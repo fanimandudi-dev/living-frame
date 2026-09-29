@@ -95,7 +95,8 @@ Un témoin discret (à peine visible) indique l'état de la détection :
 |---|---|---|
 | Point rouge + « caméra refusée » | Permission refusée | Menu ⋮ → Autorisations → Caméra → Autoriser, puis touche `C` |
 | Point rouge + « aucune caméra » | Ouvert en HTTP (pas HTTPS) ou matériel sans caméra | Vérifier l'adresse `https://` |
-| L'œuvre ne réagit plus après une visite | Comportement normal : l'œuvre salue **une fois par visite** | S'éloigner quelques secondes, revenir |
+| L'œuvre reste animée très longtemps | Comportement normal : elle reste animée **tant que quelqu'un est devant** | Rien — elle revient au repos quand la personne s'éloigne |
+| Je m'éloigne puis reviens aussitôt : plus d'animation | Comportement normal : une salutation par approche (mono-passe) | S'éloigner quelques secondes de plus, puis revenir |
 | Le tableau reste figé | Veille du navigateur | Toucher l'écran une fois ; vérifier le réglage de veille (30 min) |
 | L'animation « clignote » quand on bouge | Seuils à ajuster pour votre emplacement | Demander un ajustement à votre prestataire (calibration) |
 | Rien ne va plus | — | Fermer et rouvrir l'application — la configuration est conservée |

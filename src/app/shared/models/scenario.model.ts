@@ -24,7 +24,7 @@ export interface Scenario {
   // --- timings exposés dans le Studio (EF-11, section Timing)
   /** Délai avant réaction (APPROACH → ENGAGED). */
   engageDelayMs: number;
-  /** Durée d'affichage du message (HOLD). */
+  /** Durée MINIMALE du message (HOLD) — il persiste tant que la personne est présente. */
   holdDurationMs: number;
   /** Délai du fondu de retour (RESET). */
   resetDelayMs: number;
