@@ -1,0 +1,71 @@
+/* Scène d'œuvre : remplit son hôte. Le conteneur décide de la taille
+   (plein écran dans le Frame, cadré dans le Preview). */
+:host {
+  display: block;
+  height: 100%;
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: #0c0c0d;
+
+  // Vignette discrète : un cadrage sombre aux bords, comme sous verre —
+  // de la profondeur, pas de la décoration.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 62%,
+      rgba(0, 0, 0, 0.38) 100%
+    );
+  }
+
+  &__img {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  // Calque engagé : toute la magie est un fondu d'opacité (GPU).
+  &__img--engaged {
+    opacity: 0;
+    transition: opacity 2000ms ease;
+    will-change: opacity;
+  }
+
+  &__message {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 9%;
+    z-index: 3;
+    margin: 0;
+    padding: 0 2rem;
+    text-align: center;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: clamp(1.4rem, 3.2vw, 2.6rem);
+    letter-spacing: 0.06em;
+    color: #f3ead9;
+    text-shadow: 0 1px 24px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transition: opacity 900ms ease;
+
+    // Apparition retardée : le message naît APRÈS la transformation (EF-09).
+    &.visible {
+      opacity: 1;
+      transition: opacity 900ms ease 800ms;
+    }
+  }
+}

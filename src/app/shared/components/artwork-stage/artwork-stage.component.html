@@ -1,0 +1,12 @@
+<!-- Le tableau : deux calques superposés + message. Rien d'autre. -->
+<div class="stage">
+  <img class="stage__img" [src]="idleSrc()" [alt]="artwork().name" />
+  <img
+    class="stage__img stage__img--engaged"
+    [src]="engagedSrc()"
+    alt=""
+    [style.opacity]="engagedOpacity()"
+    [style.transition-duration.ms]="fadeMs()"
+  />
+  <p class="stage__message" [class.visible]="messageVisible()">{{ messageText() }}</p>
+</div>

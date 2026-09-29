@@ -1,0 +1,255 @@
+/* Studio : fonctionnel et sobre — un outil professionnel, pas un dashboard. */
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f5f4f1;
+  color: #2b2a27;
+}
+
+.studio {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2rem;
+    font-weight: 500;
+  }
+
+  &__subtitle {
+    margin: 0 0 2.5rem;
+    color: #6d6a64;
+    line-height: 1.5;
+  }
+
+  &__section {
+    padding: 1.75rem 0;
+    border-top: 1px solid #e3e0d9;
+  }
+
+  &__section-title {
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #8a857c;
+  }
+
+  &__help {
+    margin: -0.25rem 0 1rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: #6d6a64;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 1rem;
+
+    &--thirds {
+      grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  &__label {
+    font-size: 0.8rem;
+    color: #4a473f;
+  }
+
+  &__unit {
+    font-size: 0.75rem;
+    color: #8a857c;
+  }
+
+  input[type='text'],
+  input[type='date'],
+  input[type='number'] {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #c9c5bd;
+    border-radius: 2px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.95rem;
+    color: #2b2a27;
+    transition: border-color 120ms ease;
+
+    &:focus {
+      outline: none;
+      border-color: #2b2a27;
+    }
+  }
+
+  // -------- œuvre
+
+  &__artwork {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__drop {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    border: 1px dashed #c9c5bd;
+    border-radius: 3px;
+    background: #fafaf8;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 120ms ease;
+
+    &:hover {
+      border-color: #2b2a27;
+    }
+  }
+
+  &__thumb {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 2px;
+    background: #0c0c0d;
+  }
+
+  &__drop-label {
+    font-size: 0.8rem;
+    color: #4a473f;
+  }
+
+  &__file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  &__warning {
+    margin: 0 0 0.75rem;
+    padding: 0.55rem 0.7rem;
+    border-left: 2px solid #a3591b;
+    background: #f7efe4;
+    border-radius: 0 2px 2px 0;
+    font-size: 0.85rem;
+    color: #7a4413;
+  }
+
+  // -------- interactions
+
+  &__toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__toggle {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 0.6rem;
+    align-items: center;
+    cursor: pointer;
+
+    input {
+      grid-row: span 2;
+      width: 1rem;
+      height: 1rem;
+      accent-color: #2b2a27;
+    }
+
+    span {
+      font-size: 0.95rem;
+    }
+
+    small {
+      grid-column: 2;
+      font-size: 0.78rem;
+      color: #8a857c;
+    }
+  }
+
+  &__error {
+    font-size: 0.78rem;
+    color: #8c3a2b;
+  }
+
+  &__text-button {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 0.85rem;
+    color: #5a564e;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+
+    &:hover {
+      color: #2b2a27;
+    }
+  }
+
+  // -------- actions
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid #e3e0d9;
+  }
+
+  &__button {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #c9c5bd;
+    border-radius: 2px;
+    background: #fafaf8;
+    font: inherit;
+    font-size: 0.9rem;
+    color: #2b2a27;
+    cursor: pointer;
+    transition: border-color 120ms ease, background-color 120ms ease;
+
+    &:hover:not(:disabled) {
+      border-color: #2b2a27;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--outline {
+      background: transparent;
+    }
+
+    &--primary {
+      background: #2b2a27;
+      border-color: #2b2a27;
+      color: #f5f4f1;
+
+      &:hover:not(:disabled) {
+        background: #000;
+      }
+    }
+  }
+
+  &__saved {
+    font-size: 0.85rem;
+    color: #3d6b4f;
+  }
+}

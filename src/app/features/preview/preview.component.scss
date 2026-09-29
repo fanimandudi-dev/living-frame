@@ -1,0 +1,204 @@
+/* Preview : outil du démonstrateur — lisible, technique mais sobre. */
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: #f5f4f1;
+  color: #2b2a27;
+}
+
+.preview {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2rem;
+    font-weight: 500;
+  }
+
+  &__subtitle {
+    margin: 0 0 2rem;
+    color: #6d6a64;
+    line-height: 1.5;
+  }
+
+  &__panel {
+    background: #fff;
+    border: 1px solid #e3e0d9;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    // La scène domine la page : pas de padding, juste un cadre sobre.
+    &--stage {
+      padding: 0.75rem;
+    }
+  }
+
+  &__stagewrap {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: #0c0c0d;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  &__stage {
+    display: block;
+    height: 100%;
+  }
+
+  &__section {
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #8a857c;
+  }
+
+  &__states {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__chip {
+    padding: 0.5rem 1rem;
+    border: 1px solid #c9c5bd;
+    border-radius: 2px;
+    background: #fafaf8;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: #2b2a27;
+    cursor: pointer;
+    transition: border-color 120ms ease, background-color 120ms ease;
+
+    &:hover {
+      border-color: #2b2a27;
+    }
+
+    &.active {
+      background: #2b2a27;
+      border-color: #2b2a27;
+      color: #f5f4f1;
+    }
+  }
+
+  &__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    margin: 0 0 1.25rem;
+  }
+
+  &__fact dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8a857c;
+    margin-bottom: 0.25rem;
+  }
+
+  &__fact dd {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  &__button {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #c9c5bd;
+    border-radius: 2px;
+    background: #fafaf8;
+    font: inherit;
+    font-size: 0.9rem;
+    color: #2b2a27;
+    cursor: pointer;
+
+    &:hover {
+      border-color: #2b2a27;
+    }
+
+    &.primary {
+      background: #2b2a27;
+      border-color: #2b2a27;
+      color: #f5f4f1;
+    }
+  }
+
+  &__note {
+    margin: 1.25rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #8a857c;
+  }
+
+  &__status {
+    align-self: center;
+    padding: 0.35rem 0.7rem;
+    border-radius: 2px;
+    font-size: 0.8rem;
+    background: #eeece7;
+    color: #4a473f;
+
+    &[data-status="RUNNING"] {
+      background: #e4efe7;
+      color: #3d6b4f;
+    }
+
+    &[data-status="STARTING"] {
+      background: #f7efe4;
+      color: #a3591b;
+    }
+
+    &[data-status="DENIED"],
+    &[data-status="UNAVAILABLE"],
+    &[data-status="ERROR"] {
+      background: #f5e6e2;
+      color: #8c3a2b;
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    color: #8a857c;
+    font-size: 0.9rem;
+  }
+
+  &__log {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: #4a473f;
+  }
+
+  &__nav {
+    display: flex;
+    gap: 1rem;
+  }
+
+  &__link {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #c9c5bd;
+    border-radius: 2px;
+    text-decoration: none;
+    color: #2b2a27;
+    font-size: 0.9rem;
+
+    &:hover {
+      border-color: #2b2a27;
+    }
+  }
+}

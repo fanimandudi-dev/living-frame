@@ -1,0 +1,20 @@
+<!-- Le tableau, rien d'autre : la scène d'œuvre remplit l'écran.
+     Le point de statut (mode réel uniquement) est discret par conception :
+     6 px, semi-transparent, lisible seulement de près (organisateur). -->
+<main class="frame">
+  <lf-artwork-stage
+    class="frame__stage"
+    [state]="engine.state()"
+    [distance]="engine.distance()"
+    [artwork]="artwork()"
+    [scenario]="scenarioCfg()"
+  />
+
+  @if (showStatus()) {
+    <span
+      class="frame__status"
+      [attr.data-status]="detectorStatus()"
+      aria-hidden="true"
+    ></span>
+  }
+</main>

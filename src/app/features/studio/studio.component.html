@@ -1,0 +1,221 @@
+<main class="studio">
+  <header class="studio__header">
+    <h1 class="studio__title">Studio</h1>
+    <p class="studio__subtitle">
+      Préparez l'événement, l'œuvre et le message. Tout reste sur cet appareil —
+      aucune donnée n'est envoyée.
+    </p>
+  </header>
+
+  @if (persistenceError()) {
+    <p class="studio__warning" role="alert">{{ persistenceError() }}</p>
+  }
+
+  <form class="studio__form" [formGroup]="form" (ngSubmit)="save()">
+    <!-- ÉVÉNEMENT -->
+    <section class="studio__section">
+      <h2 class="studio__section-title">Événement</h2>
+      <div class="studio__grid">
+        <label class="studio__field">
+          <span class="studio__label">Nom</span>
+          <input
+            type="text"
+            formControlName="eventName"
+            data-field="eventName"
+            maxlength="80"
+            placeholder="Mariage d'Aline & Marc"
+          />
+        </label>
+        <label class="studio__field">
+          <span class="studio__label">Date</span>
+          <input type="date" formControlName="eventDate" data-field="eventDate" />
+        </label>
+        <label class="studio__field">
+          <span class="studio__label">Thème</span>
+          <input
+            type="text"
+            formControlName="eventTheme"
+            data-field="eventTheme"
+            maxlength="40"
+            placeholder="Classique"
+          />
+        </label>
+      </div>
+    </section>
+
+    <!-- ŒUVRE -->
+    <section class="studio__section">
+      <h2 class="studio__section-title">Œuvre</h2>
+      <p class="studio__help">
+        Deux prises quasi identiques : le même cadrage au repos, puis le même
+        cadrage avec la réaction souhaitée (sourire, regard vers le visiteur).
+      </p>
+      <div class="studio__artwork">
+        <label class="studio__drop">
+          <img class="studio__thumb" [src]="idlePreview()" alt="Œuvre au repos" />
+          <span class="studio__drop-label">Image initiale (repos)</span>
+          <input
+            type="file"
+            accept="image/*"
+            class="studio__file-input"
+            data-field="idleImage"
+            (change)="onImageSelected('idle', $event)"
+          />
+        </label>
+        <label class="studio__drop">
+          <img class="studio__thumb" [src]="engagedPreview()" alt="Œuvre transformée" />
+          <span class="studio__drop-label">Image interactive (réaction)</span>
+          <input
+            type="file"
+            accept="image/*"
+            class="studio__file-input"
+            data-field="engagedImage"
+            (change)="onImageSelected('engaged', $event)"
+          />
+        </label>
+      </div>
+      @if (identicalFiles()) {
+        <p class="studio__warning" role="alert">
+          Les deux images sont identiques — le tableau ne semblera pas « vivant ».
+        </p>
+      }
+      <button
+        type="button"
+        class="studio__text-button"
+        data-action="demo-artwork"
+        (click)="useDemoArtwork()"
+      >
+        Utiliser l'œuvre de démonstration
+      </button>
+    </section>
+
+    <!-- MESSAGE -->
+    <section class="studio__section">
+      <h2 class="studio__section-title">Message</h2>
+      <label class="studio__field">
+        <span class="studio__label">Texte affiché</span>
+        <input
+          type="text"
+          formControlName="message"
+          data-field="message"
+          maxlength="120"
+          placeholder="Bienvenue dans notre histoire"
+        />
+      </label>
+      @if (invalid('message')) {
+        <p class="studio__error">Le message est requis quand il est activé.</p>
+      }
+    </section>
+
+    <!-- INTERACTION -->
+    <section class="studio__section">
+      <h2 class="studio__section-title">Interaction</h2>
+      <div class="studio__toggles">
+        <label class="studio__toggle">
+          <input type="checkbox" formControlName="detectionEnabled" data-field="detectionEnabled" />
+          <span>Détection de présence</span>
+          <small>utilise la caméra frontale — traitement 100 % local</small>
+        </label>
+        <label class="studio__toggle">
+          <input
+            type="checkbox"
+            formControlName="transformationEnabled"
+            data-field="transformationEnabled"
+          />
+          <span>Transformation de l'œuvre</span>
+          <small>le fondu vers l'image interactive</small>
+        </label>
+        <label class="studio__toggle">
+          <input type="checkbox" formControlName="messageEnabled" data-field="messageEnabled" />
+          <span>Message</span>
+          <small>l'apparition du texte pendant la visite</small>
+        </label>
+      </div>
+    </section>
+
+    <!-- TIMING -->
+    <section class="studio__section">
+      <h2 class="studio__section-title">Timing</h2>
+      <div class="studio__grid studio__grid--thirds">
+        <label class="studio__field">
+          <span class="studio__label">Délai avant réaction</span>
+          <input
+            type="number"
+            formControlName="engageDelayS"
+            data-field="engageDelayS"
+            step="0.1"
+            min="0.2"
+            max="10"
+          />
+          <span class="studio__unit">secondes</span>
+          @if (invalid('engageDelayS')) {
+            <span class="studio__error">Entre 0,2 et 10 s</span>
+          }
+        </label>
+        <label class="studio__field">
+          <span class="studio__label">Durée du message</span>
+          <input
+            type="number"
+            formControlName="holdDurationS"
+            data-field="holdDurationS"
+            step="0.5"
+            min="1"
+            max="60"
+          />
+          <span class="studio__unit">secondes</span>
+          @if (invalid('holdDurationS')) {
+            <span class="studio__error">Entre 1 et 60 s</span>
+          }
+        </label>
+        <label class="studio__field">
+          <span class="studio__label">Délai de retour</span>
+          <input
+            type="number"
+            formControlName="resetDelayS"
+            data-field="resetDelayS"
+            step="0.1"
+            min="0.2"
+            max="10"
+          />
+          <span class="studio__unit">secondes</span>
+          @if (invalid('resetDelayS')) {
+            <span class="studio__error">Entre 0,2 et 10 s</span>
+          }
+        </label>
+      </div>
+    </section>
+
+    <!-- ACTIONS -->
+    <footer class="studio__actions">
+      <button
+        type="submit"
+        class="studio__button"
+        data-action="save"
+        [disabled]="form.invalid"
+      >
+        Enregistrer
+      </button>
+      <button
+        type="button"
+        class="studio__button studio__button--outline"
+        data-action="preview"
+        [disabled]="form.invalid"
+        (click)="preview()"
+      >
+        Prévisualiser
+      </button>
+      <button
+        type="button"
+        class="studio__button studio__button--primary"
+        data-action="launch"
+        [disabled]="form.invalid"
+        (click)="launchFrame()"
+      >
+        Lancer le cadre
+      </button>
+      @if (saveState() === 'saved') {
+        <span class="studio__saved" role="status">✓ Enregistré</span>
+      }
+    </footer>
+  </form>
+</main>

@@ -1,0 +1,46 @@
+/* Mode Frame : plein écran, sombre, curseur masqué — un tableau, pas un écran. */
+:host {
+  display: block;
+  height: 100dvh;
+  background: #0c0c0d;
+  overflow: hidden;
+  cursor: none; // kiosque : aucun élément d'interface, pas même le curseur
+  user-select: none; // aucun texte sélectionnable devant un visiteur
+  -webkit-touch-callout: none; // pas de menu long-press (iOS/tablette)
+  touch-action: manipulation; // supprime le délai de double-tap zoom
+}
+
+.frame {
+  position: relative;
+  height: 100%;
+}
+
+.frame__stage {
+  display: block;
+  height: 100%;
+}
+
+// Point de statut de la détection réelle (EF-17) : organisateur uniquement.
+// Vert = détection active · ambre = initialisation · rouge = panne.
+// Invisible de loin, aucune technologie visible par le visiteur (CA-12).
+.frame__status {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 3;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3d6b4f;
+  opacity: 0.35;
+
+  &[data-status='STARTING'] {
+    background: #a3591b;
+  }
+
+  &[data-status='DENIED'],
+  &[data-status='UNAVAILABLE'],
+  &[data-status='ERROR'] {
+    background: #8c3a2b;
+  }
+}

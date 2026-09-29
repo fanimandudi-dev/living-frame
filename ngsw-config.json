@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.csr.html",
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "oeuvres",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/artworks/**", "/icons/**"]
+      }
+    },
+    {
+      "name": "moteur-detection",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/mediapipe/wasm/vision_wasm_internal.js",
+          "/mediapipe/wasm/vision_wasm_internal.wasm",
+          "/mediapipe/models/*.tflite"
+        ]
+      }
+    },
+    {
+      "name": "wasm-variantes-repli",
+      "installMode": "lazy",
+      "resources": {
+        "files": ["/mediapipe/wasm/*"]
+      }
+    }
+  ]
+}

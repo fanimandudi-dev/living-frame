@@ -1,0 +1,34 @@
+/* ============================================================
+   Living Frame — styles globaux (Phase 2)
+
+   Le corps est sombre par défaut : la route par défaut est le cadre
+   (mode kiosque). Les autres routes redéfinissent leur propre fond.
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  background: #0c0c0d;
+  color: #e8e6e1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none; // kiosque : pas de pull-to-refresh sur tablette
+  touch-action: manipulation; // pas de délai/zoom au double-tap
+}

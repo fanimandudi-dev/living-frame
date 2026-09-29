@@ -1,0 +1,127 @@
+<main class="preview">
+  <header class="preview__header">
+    <h1 class="preview__title">Preview</h1>
+    <p class="preview__subtitle">
+      La vraie scène d'œuvre, pilotée par la machine à états — sans caméra.
+      Commandez les états à la main ou lancez la lecture automatique.
+    </p>
+  </header>
+
+  <!-- LA SCÈNE, pilotée manuellement : la répétition générale. -->
+  <section class="preview__panel preview__panel--stage">
+    <div class="preview__stagewrap">
+      <lf-artwork-stage
+        class="preview__stage"
+        [state]="engine.state()"
+        [distance]="engine.distance()"
+        [artwork]="artwork()"
+        [scenario]="scenarioCfg()"
+      />
+    </div>
+  </section>
+
+  <section class="preview__panel">
+    <h2 class="preview__section">États (commande manuelle)</h2>
+    <div class="preview__states">
+      @for (state of states; track state) {
+        <button
+          type="button"
+          class="preview__chip"
+          [class.active]="engine.state() === state"
+          [attr.data-state]="state"
+          (click)="forceState(state)"
+        >
+          {{ state }}
+        </button>
+      }
+    </div>
+
+    <dl class="preview__facts">
+      <div class="preview__fact">
+        <dt>Présence</dt>
+        <dd>{{ engine.personPresent() ? 'Quelqu’un est là' : 'Aucune personne' }}</dd>
+      </div>
+      <div class="preview__fact">
+        <dt>Distance</dt>
+        <dd>{{ engine.distance() ?? '—' }}</dd>
+      </div>
+      <div class="preview__fact">
+        <dt>Réarmement</dt>
+        <dd>
+          {{ engine.armed() ? 'Cycle possible' : 'Cycle déjà joué (mono-passe)' }}
+        </dd>
+      </div>
+    </dl>
+
+    <div class="preview__actions">
+      <button
+        type="button"
+        class="preview__button"
+        [class.primary]="!playing()"
+        (click)="toggleAutoplay()"
+      >
+        {{ playing() ? 'Arrêter la lecture automatique' : 'Lecture automatique' }}
+      </button>
+      <button
+        type="button"
+        class="preview__button"
+        data-action="reset"
+        (click)="resetEngine()"
+      >
+        Réinitialiser
+      </button>
+    </div>
+
+    <p class="preview__note">
+      Politique V0 : « grâce » — un départ pendant ENGAGED/HOLD n'interrompt pas
+      le cycle ; « mono-passe » — un nouveau cycle exige une absence confirmée
+      (ou le bouton Réinitialiser).
+    </p>
+  </section>
+
+  <section class="preview__panel">
+    <h2 class="preview__section">Capteur réel (caméra — Phase 6)</h2>
+    <div class="preview__actions">
+      <button
+        type="button"
+        class="preview__button"
+        [class.primary]="!detectionActive()"
+        data-action="real-detection"
+        (click)="toggleRealDetection()"
+      >
+        {{ detectionActive() ? 'Arrêter la caméra' : 'Activer la détection réelle' }}
+      </button>
+      @if (detectorStatus() !== 'IDLE') {
+        <span class="preview__status" [attr.data-status]="detectorStatus()">
+          {{ statusLabel(detectorStatus()) }}
+        </span>
+      }
+    </div>
+    <p class="preview__note">
+      Chaîne complète : caméra → MediaPipe (local, aucune donnée transmise) →
+      DetectionAdapter → InteractionEngine. Nécessite HTTPS (ou localhost) et
+      l'autorisation caméra. La détection mono-passe s'applique : éloignez-vous
+      du cadre pour réarmer un cycle.
+    </p>
+  </section>
+
+  <section class="preview__panel">
+    <h2 class="preview__section">Journal des transitions</h2>
+    @if (log().length === 0) {
+      <p class="preview__empty">Aucune transition pour l'instant.</p>
+    } @else {
+      <ol class="preview__log">
+        @for (entry of log(); track $index) {
+          <li>{{ entry }}</li>
+        }
+      </ol>
+    }
+  </section>
+
+  <nav class="preview__nav">
+    <a [routerLink]="['/frame']" [queryParams]="{ demo: 1 }" class="preview__link">
+      Voir le cadre en démo auto
+    </a>
+    <a routerLink="/studio" class="preview__link">Studio</a>
+  </nav>
+</main>
