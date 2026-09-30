@@ -1,7 +1,8 @@
-<!-- Le tableau : calque de repos + photos du défilé empilées + message.
-     Rien d'autre. Conteneur engagé = opacité (durée pilotée par l'état) ;
-     photos empilées = défilé en fondu (celle portant .current est visible) ;
-     toutes respirent ensemble quand l'œuvre est « vivante ». -->
+<!-- Le tableau : calque de repos + photos du défilé empilées + lumière +
+     message. Rien d'autre. Conteneur engagé = opacité (durée pilotée par
+     l'état) ; photos empilées = défilé en fondu (celle portant .current est
+     visible) ; SceneFx = calque de lumière chorégraphié par GSAP ; message =
+     naissance chorégraphiée par GSAP (classe .visible = marqueur + voile). -->
 <div class="stage" [class.message-on]="messageVisible()">
   <img class="stage__img" [src]="idleSrc()" [alt]="artwork().name" />
 
@@ -21,10 +22,18 @@
     }
   </div>
 
+  <lf-scene-fx
+    class="stage__fx"
+    [state]="state()"
+    [distance]="distance()"
+    [intensity]="intensity()"
+    [scene]="scene()"
+  />
+
   <p class="stage__message" [class.visible]="messageVisible()">
-    <span class="stage__message-text">{{ messageText() }}</span>
+    <span class="stage__message-text" #messageTextEl>{{ messageText() }}</span>
     @if (eventLine() !== '') {
-      <span class="stage__event">{{ eventLine() }}</span>
+      <span class="stage__event" #eventLineEl>{{ eventLine() }}</span>
     }
   </p>
 </div>

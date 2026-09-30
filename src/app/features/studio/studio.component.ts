@@ -16,6 +16,8 @@ import { ImageRegistryService } from '../../core/storage/image-registry.service'
 import { DEFAULT_FRAME_CONFIG } from '../../shared/models/frame-config.model';
 import type { FrameConfig } from '../../shared/models/frame-config.model';
 import type { Artwork } from '../../shared/models/artwork.model';
+import { GOLDEN_WELCOME } from '../../shared/models/scene.model';
+import type { SceneIntensity } from '../../shared/models/scene.model';
 
 /**
  * STUDIO — configuration de l'organisateur (EF-11 à EF-13).
@@ -89,6 +91,8 @@ export class StudioComponent implements OnInit {
         Validators.max(StudioComponent.TIMING_BOUNDS.reset.max),
       ],
     ],
+    // Mise en scène (V1)
+    intensity: ['ELEGANT' as SceneIntensity],
   });
 
   /** Œuvre en cours d'édition (signal — les aperçus en dérivent). */
@@ -265,6 +269,7 @@ export class StudioComponent implements OnInit {
       engageDelayS: config.scenario.engageDelayMs / 1000,
       holdDurationS: config.scenario.holdDurationMs / 1000,
       resetDelayS: config.scenario.resetDelayMs / 1000,
+      intensity: config.scenario.intensity ?? 'ELEGANT',
     });
     this.updateMessageValidator(config.scenario.messageEnabled);
   }
@@ -298,6 +303,8 @@ export class StudioComponent implements OnInit {
         holdDurationMs: Math.round(value.holdDurationS * 1000),
         resetDelayMs: Math.round(value.resetDelayS * 1000),
         message: value.message.trim() === '' ? undefined : value.message.trim(),
+        sceneId: GOLDEN_WELCOME.id,
+        intensity: value.intensity,
       },
     };
   }

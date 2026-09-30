@@ -80,6 +80,21 @@ describe('ScenarioEngineService — persistance (fake-indexeddb)', () => {
     expect(engine.persistenceError()).toBeNull();
   });
 
+  it('migration — une configuration sans scène ni intensité hérite des défauts V1', async () => {
+    const stored = structuredClone(DEFAULT_FRAME_CONFIG);
+    // Simule une config écrite avant le moteur de scènes (30/09/2026).
+    delete (stored.scenario as { sceneId?: string }).sceneId;
+    delete (stored.scenario as { intensity?: string }).intensity;
+
+    const storage = new StorageService();
+    await storage.saveConfig(stored);
+    const engine = new ScenarioEngineService(storage, new ImageRegistryService());
+    await engine.load();
+
+    expect(engine.config().scenario.sceneId).toBe(DEFAULT_FRAME_CONFIG.scenario.sceneId);
+    expect(engine.config().scenario.intensity).toBe('ELEGANT');
+  });
+
   it('CA-09 — après « redémarrage », configuration et images sont restaurées', async () => {
     const storage = new StorageService();
     const file = new File([new Uint8Array([7, 7, 7])], 'mariage.jpg', { type: 'image/jpeg' });

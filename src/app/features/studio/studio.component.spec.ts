@@ -196,6 +196,19 @@ describe('StudioComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/frame'], { queryParams: { demo: 1 } });
   });
 
+  it('intensité — le choix de l’organisateur est enregistré (Spectaculaire)', async () => {
+    const { api } = await createStudio();
+    const scenario = TestBed.inject(ScenarioEngineService);
+    const router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    api.form.controls.intensity.setValue('SPECTACULAR');
+    await api.preview(); // enregistre puis navigue
+
+    expect(scenario.config().scenario.intensity).toBe('SPECTACULAR');
+    expect(scenario.config().scenario.sceneId).toBe('golden-welcome');
+  });
+
   it('EF-14 — l’import d’image persist le fichier (via ScenarioEngine.saveImage)', async () => {
     const { fixture, api } = await createStudio();
     const scenario = TestBed.inject(ScenarioEngineService);

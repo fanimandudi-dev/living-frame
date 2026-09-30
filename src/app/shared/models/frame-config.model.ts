@@ -1,3 +1,4 @@
+import { GOLDEN_WELCOME } from './scene.model';
 import type { Artwork } from './artwork.model';
 import type { Scenario } from './scenario.model';
 
@@ -55,5 +56,8 @@ export const DEFAULT_FRAME_CONFIG: FrameConfig = {
     holdDurationMs: 5000,
     resetDelayMs: 2000,
     message: 'Bienvenue dans notre histoire',
+    // Mise en scène (V1) — scène visuelle + intensité des effets.
+    sceneId: GOLDEN_WELCOME.id,
+    intensity: 'ELEGANT',
   },
 };

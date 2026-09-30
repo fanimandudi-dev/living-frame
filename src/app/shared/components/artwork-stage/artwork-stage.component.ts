@@ -1,13 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  ElementRef,
   computed,
   effect,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ImageRegistryService } from '../../../core/storage/image-registry.service';
+import { AnimationEngineService } from '../../../core/animation/animation-engine.service';
 import {
   APPROACH_FADE_MS,
   APPROACH_OPACITY,
@@ -20,6 +24,13 @@ import type {
 import type { Artwork } from '../../models/artwork.model';
 import type { Scenario } from '../../models/scenario.model';
 import type { EventInfo } from '../../models/frame-config.model';
+import {
+  GOLDEN_WELCOME,
+  INTENSITY_PRESETS,
+  SCENES,
+} from '../../models/scene.model';
+import type { LivingScene, SceneIntensity } from '../../models/scene.model';
+import { SceneFxComponent } from '../scene-fx/scene-fx.component';
 
 /** Événement par défaut : aucune ligne nominative sous le message. */
 const NO_EVENT: EventInfo = { name: '' };
@@ -35,18 +46,15 @@ export const ENGAGED_SLIDE_MS = 6000;
  * événement) et les traduit en visuel. Aucune décision, aucun timer, aucune
  * connaissance du capteur — tout le comportement est dans le moteur.
  *
- * Le rendu « artisanal » (affinage du 30/09/2026) :
- * - fondu d'opacité à courbe douce (cubic-bezier), durée pilotée par l'état ;
- * - en ENGAGED/HOLD, l'œuvre RESPIRE : zoom très lent (+4,5 %) et lumière
- *   légèrement réchauffée — elle vit, ce n'est plus un échange d'image ;
+ * Répartition des responsabilités (V1, moteur de scènes — 30/09/2026) :
+ * - CSS : fondus d'images (courbe artisanale), respiration du défilé, voile ;
+ * - ANIMATION ENGINE (GSAP) : chorégraphie — calque de lumière (SceneFx)
+ *   et naissance/retrait du message (phases de la scène, selon l'intensité) ;
  * - DÉFILÉ : tant que la personne est présente, les photos engagées se
- *   remplacent en fondu (une toutes les `slideMs` ms, en boucle) — la
- *   présence est récompensée, l'œuvre continue d'évoluer ;
- * - le message naît en Cormorant Garamond italique : il émerge flou et
- *   espacé puis se pose, avec le voile de lisibilité et la ligne nominative
- *   de l'événement en capitales espacées.
+ *   remplacent en fondu (une toutes les `slideMs` ms, en boucle).
  */
 @Component({
+  imports: [SceneFxComponent],
   selector: 'lf-artwork-stage',
   templateUrl: './artwork-stage.component.html',
   styleUrl: './artwork-stage.component.scss',
@@ -54,6 +62,8 @@ export const ENGAGED_SLIDE_MS = 6000;
 })
 export class ArtworkStageComponent {
   private readonly registry = inject(ImageRegistryService);
+  private readonly anim = inject(AnimationEngineService);
+  private readonly destroyRef = inject(DestroyRef);
 
   /** État courant de la machine à états. */
   readonly state = input.required<FrameState>();
@@ -61,7 +71,7 @@ export class ArtworkStageComponent {
   readonly distance = input<DistanceLevel | null>(null);
   /** Œuvre à afficher (repos + séquence du défilé). */
   readonly artwork = input.required<Artwork>();
-  /** Scénario actif : toggles, message, délais. */
+  /** Scénario actif : toggles, message, délais, scène, intensité. */
   readonly scenario = input.required<Scenario>();
   /** Métadonnées de l'événement — la ligne nominative sous le message. */
   readonly event = input<EventInfo>(NO_EVENT);
@@ -70,6 +80,24 @@ export class ArtworkStageComponent {
 
   /** Index de la photo du défilé actuellement affichée. */
   protected readonly photoIndex = signal(0);
+
+  /** Cibles de la chorégraphie du message (références de template). */
+  private readonly messageTextRef = viewChild<ElementRef<HTMLElement>>('messageTextEl');
+  private readonly eventLineRef = viewChild<ElementRef<HTMLElement>>('eventLineEl');
+  /** Timeline GSAP du message en cours (naissance ou retrait). */
+  private messageAnim: ReturnType<AnimationEngineService['messageIn']> | null = null;
+  /** Le message a-t-il déjà été montré pour cette visite ? */
+  private messageShown = false;
+
+  /** Scène visuelle dérivée du scénario (défaut : Golden Welcome). */
+  protected readonly scene = computed<LivingScene>(
+    () => SCENES[this.scenario().sceneId ?? GOLDEN_WELCOME.id] ?? GOLDEN_WELCOME,
+  );
+
+  /** Puissance des effets, dérivée du scénario. */
+  protected readonly intensity = computed<SceneIntensity>(
+    () => this.scenario().intensity ?? 'ELEGANT',
+  );
 
   constructor() {
     // Préchargement de TOUTES les photos du défilé dès que la séquence
@@ -101,6 +129,34 @@ export class ArtworkStageComponent {
         this.photoIndex.set(0);
       }
     });
+
+    // MESSAGE : chorégraphie GSAP — naissance (flou → net, espacement qui se
+    // pose) au moment prévu par la scène, retrait doux au départ. L'opacité
+    // appartient à GSAP ; la classe .visible reste un marqueur (voile, tests).
+    effect(() => {
+      const visible = this.messageVisible();
+      const textEl = this.messageTextRef()?.nativeElement;
+      if (textEl === undefined) {
+        return;
+      }
+      const eventEl = this.eventLineRef()?.nativeElement ?? null;
+      if (visible) {
+        this.messageAnim?.kill();
+        this.messageShown = true;
+        this.messageAnim = this.anim.messageIn(
+          textEl,
+          eventEl,
+          INTENSITY_PRESETS[this.intensity()],
+          this.scene(),
+        );
+      } else if (this.messageShown) {
+        this.messageAnim?.kill();
+        this.messageShown = false;
+        this.messageAnim = this.anim.messageOut(textEl, eventEl);
+      }
+    });
+
+    this.destroyRef.onDestroy(() => this.messageAnim?.kill());
   }
 
   // ------------------------------------------------------------ visuels
@@ -158,7 +214,7 @@ export class ArtworkStageComponent {
     return scenario.messageEnabled ? (scenario.message ?? '') : '';
   });
 
-  /** Le message apparaît pendant ENGAGED/HOLD, en fondu retardé (CSS). */
+  /** Le message apparaît pendant ENGAGED/HOLD (chorégraphié par GSAP). */
   protected readonly messageVisible = computed(
     () =>
       this.messageText() !== '' &&

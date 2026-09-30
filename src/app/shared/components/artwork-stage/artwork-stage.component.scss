@@ -98,7 +98,19 @@
     }
   }
 
-  // --- MESSAGE ------------------------------------------------------------
+  // --- LUMIÈRE (SceneFx) ----------------------------------------------------
+  // Le composant enfant se positionne lui-même ; on garantit juste le plan.
+  &__fx {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+
+  // --- MESSAGE (chorégraphie GSAP) ------------------------------------------
+  // L'opacité, le flou, l'espacement et la montée appartiennent à GSAP
+  // (AnimationEngine.messageIn/messageOut, phases de la scène). La classe
+  // .visible est un MARQUEUR : elle active le voile ci-dessus et sert aux
+  // tests — aucun style d'animation ici, pour ne pas lutter contre GSAP.
   &__message {
     position: absolute;
     left: 0;
@@ -109,13 +121,6 @@
     padding: 0 2rem;
     text-align: center;
     opacity: 0;
-    transition: opacity 650ms cubic-bezier(0.4, 0, 1, 1); // sortie : douce, immédiate
-
-    &.visible {
-      opacity: 1;
-      // entrée : après la transformation, tout en douceur
-      transition: opacity 1400ms cubic-bezier(0.3, 0.6, 0.2, 1) 900ms;
-    }
   }
 
   &__message-text {
@@ -130,6 +135,7 @@
     text-shadow:
       0 1px 3px rgba(0, 0, 0, 0.55),
       0 2px 30px rgba(0, 0, 0, 0.4);
+    will-change: transform, filter, opacity;
   }
 
   // Ligne nominative : le nom de l'événement, en capitales espacées.
@@ -144,27 +150,6 @@
     color: rgba(233, 223, 201, 0.82);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     opacity: 0;
-    transition: opacity 600ms ease; // sortie immédiate
-  }
-}
-
-// Naissance du message : il émerge flou et espacé, puis se pose.
-// (de `from` vers les styles naturels — la fin = l'état de repos, donc
-// aucune rupture visuelle à la disparition de l'animation)
-.stage__message.visible .stage__message-text {
-  animation: stage-message-in 1700ms cubic-bezier(0.2, 0.6, 0.2, 1) 900ms both;
-}
-
-// La ligne nominative entre en second, une fois le message posé.
-.stage__message.visible .stage__event {
-  opacity: 1;
-  transition: opacity 1000ms ease 2000ms;
-}
-
-@keyframes stage-message-in {
-  from {
-    letter-spacing: 0.34em;
-    transform: translateY(18px);
-    filter: blur(10px);
+    will-change: opacity;
   }
 }

@@ -8,6 +8,8 @@
  */
 export type ScenarioId = 'welcome';
 
+import type { SceneIntensity } from './scene.model';
+
 export interface Scenario {
   id: ScenarioId;
   /** Nom lisible, affiché dans le Studio. */
@@ -32,4 +34,10 @@ export interface Scenario {
   // --- message
   /** Texte affiché pendant ENGAGED/HOLD. Ex. : « Bienvenue dans notre histoire ». */
   message?: string;
+
+  // --- mise en scène (V1 — moteur de scènes, 30/09/2026)
+  /** Scène visuelle jouée pendant la visite (identifiant du registre). */
+  sceneId?: string;
+  /** Puissance des effets : Subtil · Élégant · Spectaculaire. */
+  intensity?: SceneIntensity;
 }

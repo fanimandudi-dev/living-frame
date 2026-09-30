@@ -62,10 +62,15 @@ export class ScenarioEngineService {
         // (30/09/2026) n'ont qu'une photo engagée — on les normalise
         // en séquence, sans jamais réécrire la base.
         const artwork = normalizeArtwork(stored.artwork);
+        // Fusion avec les défauts : les champs ajoutés après coup (scène,
+        // intensité — V1, 30/09/2026) trouvent leurs valeurs sans jamais
+        // réécrire la base.
+        const scenario = { ...DEFAULT_FRAME_CONFIG.scenario, ...stored.scenario };
+        const event = { ...DEFAULT_FRAME_CONFIG.event, ...stored.event };
         // D'abord les object URLs (pour que la config publiée s'affiche d'emblée),
         // ensuite la configuration.
         await this.hydrateImages(artwork);
-        this._config.set({ ...stored, artwork });
+        this._config.set({ ...stored, artwork, scenario, event });
       }
       this.persistenceError.set(null);
     } catch {

@@ -1,0 +1,49 @@
+/* Calque de lumière — remplit la scène, ne capte aucun événement.
+   Les opacités/positions sont pilotées par GSAP ; ici, seules les matières. */
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fx {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+// Halo chaud derrière le sujet — se lève à l'approche, pulse pendant la visite.
+.fx__glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0; // GSAP prend le relais
+  background: radial-gradient(
+    ellipse 70% 55% at 50% 62%,
+    rgba(255, 213, 142, 0.5) 0%,
+    rgba(255, 213, 142, 0.18) 45%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  will-change: opacity;
+}
+
+// Balayage de lumière — une bande dorée traversée en diagonale, floue,
+// comme un reflet sur le verre du cadre.
+.fx__sweep {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: -60%;
+  width: 75%;
+  opacity: 0; // GSAP prend le relais
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 226, 168, 0.5) 50%,
+    transparent 100%
+  );
+  filter: blur(7px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}

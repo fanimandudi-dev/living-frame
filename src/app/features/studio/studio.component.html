@@ -172,6 +172,27 @@
           <small>l'apparition du texte pendant la visite</small>
         </label>
       </div>
+
+      <div class="studio__intensity">
+        <span class="studio__label">Intensité des effets</span>
+        <div class="studio__intensity-options" role="radiogroup" aria-label="Intensité des effets">
+          <label class="studio__intensity-option">
+            <input type="radio" formControlName="intensity" value="SUBTLE" data-field="intensity-SUBTLE" />
+            <span>Subtil</span>
+          </label>
+          <label class="studio__intensity-option">
+            <input type="radio" formControlName="intensity" value="ELEGANT" data-field="intensity-ELEGANT" />
+            <span>Élégant</span>
+          </label>
+          <label class="studio__intensity-option">
+            <input type="radio" formControlName="intensity" value="SPECTACULAR" data-field="intensity-SPECTACULAR" />
+            <span>Spectaculaire</span>
+          </label>
+        </div>
+        <p class="studio__help">
+          La puissance de la mise en scène : lumière et théâtralité du déroulé.
+        </p>
+      </div>
     </section>
 
     <!-- TIMING -->

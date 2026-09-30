@@ -326,3 +326,48 @@
   font-size: 0.85rem;
   opacity: 0.65;
 }
+
+/* Intensité des effets — pastilles radio (V1, moteur de scènes). */
+.studio__intensity {
+  margin-top: 1.25rem;
+}
+
+.studio__intensity-options {
+  display: inline-flex;
+  border: 1px solid #c9c5bd;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.studio__intensity-option {
+  position: relative;
+
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  span {
+    display: block;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.9rem;
+    color: #4a473f;
+    background: #fafaf8;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease;
+  }
+
+  input:checked + span {
+    background: #2b2a27;
+    color: #fafaf8;
+  }
+
+  input:focus-visible + span {
+    outline: 2px solid #8a7a4f;
+    outline-offset: -2px;
+  }
+}
