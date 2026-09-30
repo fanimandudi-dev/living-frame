@@ -1,7 +1,13 @@
-<!-- Calque de lumière : halo chaud + balayage doré, pilotés par GSAP
+<!-- Calque de lumière : halo + balayage, pilotés par GSAP
      (AnimationEngineService) selon l'état du moteur d'interaction.
-     Aucune logique ici — que des cibles d'animation. -->
+     Les dégradés viennent de la palette de la scène ; GSAP n'anime
+     que l'opacité et la position. Aucune logique ici. -->
 <div class="fx">
-  <div class="fx__glow" #glow></div>
-  <div class="fx__sweep" #sweep></div>
+  <div class="fx__glow" #glow [style.background]="glowBackground()"></div>
+  <div
+    class="fx__sweep"
+    #sweep
+    [class.fx__sweep--rise]="isRise()"
+    [style.background]="sweepBackground()"
+  ></div>
 </div>

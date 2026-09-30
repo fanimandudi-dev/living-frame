@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { AnimationEngineService } from './animation-engine.service';
 import {
+  AURORA,
   GOLDEN_WELCOME,
   INTENSITY_PRESETS,
 } from '../../shared/models/scene.model';
@@ -84,6 +85,22 @@ describe('AnimationEngineService — chorégraphie GSAP', () => {
       .getChildren(false, true, false)
       .filter((t) => t.targets().includes(glow as never));
     expect(glowTweens.length).toBeGreaterThan(0);
+    // Rendu à t = 10 s : le balayage diagonal a traversé le cadre.
+    tl.time(10);
+    expect(sweep['xPercent']).toBe(160);
+  });
+
+  it('entrance (AURORA) : le rideau de lumière se lève verticalement', () => {
+    const glow: Record<string, unknown> = { opacity: 0 };
+    const sweep: Record<string, unknown> = { yPercent: 0, opacity: 0 };
+
+    const tl = engine.entrance(glow, sweep, INTENSITY_PRESETS.ELEGANT, AURORA);
+
+    // Rendu à t = 10 s : l'aube est montée au-dessus du cadre.
+    tl.time(10);
+    expect(sweep['yPercent']).toBe(-40);
+    // Cette scène n'utilise pas le balayage diagonal.
+    expect(sweep['xPercent']).toBeUndefined();
   });
 
   it('exit : le halo s’éteint complètement', () => {

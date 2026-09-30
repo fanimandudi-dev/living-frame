@@ -18,7 +18,7 @@ import type {
  *
  * Ce service est PUR : il fabrique des timelines à partir de cibles et de
  * configuration (scène + intensité). Aucun état, aucun DOM propre — les
- * tests pilotent les timelines avec de simples objets (progress(1)).
+ * tests pilotent les timelines avec de simples objets (time(10), progress(1)).
  *
  * Le CSS garde ce qu'il fait bien (fondus d'images, respiration) ; GSAP
  * prend la mise en scène (lumière, typographie).
@@ -44,9 +44,10 @@ export class AnimationEngineService {
 
   /**
    * ENGAGED : la chorégraphie d'entrée — d'abord le calme, puis la lumière
-   * traverse l'œuvre, le halo se lève, et pulse très lentement tant que la
-   * personne reste (la répétition infinie est volontaire : elle est tuée
-   * par la prochaine animation sur la même cible, `overwrite`).
+   * traverse l'œuvre (diagonale, ou rideau qui se lève selon la scène), le
+   * halo se lève, et pulse très lentement tant que la personne reste (la
+   * répétition infinie est volontaire : elle est tuée par la prochaine
+   * animation sur la même cible, `overwrite`).
    */
   entrance(
     glow: gsap.TweenTarget,
@@ -55,16 +56,17 @@ export class AnimationEngineService {
     scene: LivingScene,
   ): gsap.core.Timeline {
     const p = scene.phases;
+    const isRise = scene.sweepStyle === 'RISE';
+    const from: gsap.TweenVars = isRise ? { yPercent: 120 } : { xPercent: -160 };
+    const to: gsap.TweenVars = isRise
+      ? { yPercent: -40, duration: p.sweepMs / 1000, ease: 'power2.inOut' }
+      : { xPercent: 160, duration: p.sweepMs / 1000, ease: 'power2.inOut' };
+
     const tl = gsap.timeline();
     tl.set(glow, { opacity: 0 }, 0)
-      .set(sweep, { xPercent: -160, opacity: 0 }, 0)
+      .set(sweep, { ...from, opacity: 0 }, 0)
       .set(sweep, { opacity: preset.sweepOpacity }, p.sweepAtMs / 1000)
-      .fromTo(
-        sweep,
-        { xPercent: -160 },
-        { xPercent: 160, duration: p.sweepMs / 1000, ease: 'power2.inOut' },
-        p.sweepAtMs / 1000,
-      )
+      .fromTo(sweep, { ...from }, to, p.sweepAtMs / 1000)
       .set(sweep, { opacity: 0 }, (p.sweepAtMs + p.sweepMs) / 1000)
       .to(
         glow,

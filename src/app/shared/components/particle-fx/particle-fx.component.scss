@@ -1,0 +1,15 @@
+/* Poussière lumineuse : le conteneur remplit la scène, ne capte rien.
+   Le canvas est inséré par PixiJS (resizeTo = cet hôte). */
+:host {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+}

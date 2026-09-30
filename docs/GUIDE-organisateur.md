@@ -57,6 +57,13 @@ l'autre, comme un album qui se raconte. Dans le Studio, section Œuvre,
 utilisez « Ajouter une photo » (et le ✕ pour retirer). Prenez-les si
 possible dans la même séance, avec le même cadrage et la même lumière.
 
+### La scène et son intensité
+
+Dans le Studio, choisissez la **scène visuelle** : *Golden Welcome*
+(or chaleureux, classique) ou *Aurora* (argent, contemporain) — puis son
+**intensité** (Subtil, Élégant ou Spectaculaire). Vous pouvez tout essayer
+avec le bouton Prévisualiser.
+
 ### Les autres réglages
 
 | Réglage | Effet |

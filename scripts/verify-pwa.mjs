@@ -40,9 +40,18 @@ for (const asset of [
 }
 
 // 3. Aucune référence à un CDN dans le JS livré (garantie offline — risque R1).
+//    Allowlist explicite : les constantes de chemins par défaut des transcodeurs
+//    KTX2/Basis de PixiJS (chunk paresseux). Inertes dans Living Frame — nous
+//    ne chargeons AUCUNE texture compressée (Graphics procéduraux uniquement),
+//    ces URL ne sont jamais contactées. Tout autre URL CDN reste bloquant.
+const INERT_CDN_PREFIX = 'https://cdn.jsdelivr.net/npm/pixi.js/transcoders/';
 const jsFiles = readdirSync(DIST).filter((f) => f.endsWith('.js'));
 const bundled = jsFiles.map((f) => readFileSync(`${DIST}/${f}`, 'utf8')).join('\n');
-check('aucune URL CDN (jsdelivr) dans le JS livré', !bundled.includes('cdn.jsdelivr'));
+const liveCdnRefs = bundled.split(INERT_CDN_PREFIX).join('');
+check(
+  'aucune URL CDN (jsdelivr) active dans le JS livré',
+  !liveCdnRefs.includes('cdn.jsdelivr'),
+);
 check('aucune URL CDN (storage.googleapis) dans le JS livré', !bundled.includes('storage.googleapis'));
 
 // 4. Le manifeste est complet.

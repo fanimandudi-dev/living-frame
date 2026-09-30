@@ -53,7 +53,7 @@ repos à son départ (une salutation par approche).
 
 Angular 22 · TypeScript strict · Angular Signals · SCSS · composants standalone ·
 MediaPipe Tasks Vision (WASM + modèle auto-hébergés — zéro CDN) · IndexedDB · PWA ·
-Cormorant Garamond (SIL OFL, embarquée) · GSAP (chorégraphie — moteur de scènes V1).
+Cormorant Garamond (SIL OFL, embarquée) · GSAP (chorégraphie) · PixiJS 8 (poussière lumineuse, chunk paresseux).
 
 Aucun backend. Aucune donnée ne quitte l'appareil : la détection est locale,
 sans identification ni stockage d'images.
@@ -65,6 +65,7 @@ sans identification ni stockage d'images.
 - `docs/PHASE-3…9-*.md` — décisions et vérifications de chaque phase
 - `docs/GUIDE-organisateur.md` — guide client : installation, préparation, jour J, dépannage
 - `docs/V1-01-moteur-de-scenes.md` — chorégraphie GSAP, scène Golden Welcome, intensités
+- `docs/V1-02-aurora-et-particules.md` — scène Aurora, particules PixiJS, garde CDN
 - `docs/PHASE-9-prototype-physique.md` — intégration physique, check-list de démonstration, limites V0
 
 ## Livrable

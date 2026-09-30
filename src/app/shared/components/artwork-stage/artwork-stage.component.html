@@ -30,6 +30,14 @@
     [scene]="scene()"
   />
 
+  <lf-particle-fx
+    class="stage__fx"
+    [state]="state()"
+    [distance]="distance()"
+    [intensity]="intensity()"
+    [scene]="scene()"
+  />
+
   <p class="stage__message" [class.visible]="messageVisible()">
     <span class="stage__message-text" #messageTextEl>{{ messageText() }}</span>
     @if (eventLine() !== '') {

@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  computed,
   effect,
   inject,
   input,
@@ -10,9 +11,7 @@ import {
 } from '@angular/core';
 import { gsap } from 'gsap';
 import { AnimationEngineService } from '../../../core/animation/animation-engine.service';
-import {
-  APPROACH_OPACITY,
-} from '../../../core/interaction/interaction-state';
+import { APPROACH_OPACITY } from '../../../core/interaction/interaction-state';
 import type {
   DistanceLevel,
   FrameState,
@@ -24,12 +23,14 @@ import {
 import type { LivingScene, SceneIntensity } from '../../models/scene.model';
 
 /**
- * CALQUE DE LUMIÈRE — la partie visible de la scène : halo chaud + balayage
- * doré, superposés à l'œuvre et chorégraphiés par l'Animation Engine.
+ * CALQUE DE LUMIÈRE — la partie visible de la scène : halo + balayage,
+ * superposés à l'œuvre et chorégraphiés par l'Animation Engine.
  *
  * Composant de présentation : il traduit l'état du moteur d'interaction en
  * animations GSAP. La logique de chorégraphie vit dans le moteur et la
- * scène (configuration) — ici, aucune durée, aucun seuil.
+ * scène (configuration) — ici, aucune durée, aucun seuil. Les COULEURS
+ * viennent de la palette de la scène (doré, argent…), liées au template —
+ * GSAP n'anime que l'opacité et la position, jamais les dégradés.
  *
  * Cycle de vie : l'entrée (ENGAGED) n'est jouée QU'UNE fois par visite ;
  * les changements de distance pendant ENGAGED/HOLD ne la relancent pas.
@@ -99,10 +100,30 @@ export class SceneFxComponent {
     });
   }
 
+  // -------------------------------------------------------- matières
+
+  /** Tue les animations en cours avant chaque nouvelle phase. */
   private stop(): void {
     for (const animation of this.active) {
       animation.kill();
     }
     this.active = [];
   }
+
+  /** Dégradé du halo, de la palette de la scène. */
+  protected readonly glowBackground = computed(() => {
+    const palette = this.scene().palette;
+    return `radial-gradient(ellipse 70% 55% at 50% 62%, ${palette.glow} 0%, ${palette.glowSoft} 45%, transparent 70%)`;
+  });
+
+  /** Dégradé du balayage — diagonal, ou aube montante selon la scène. */
+  protected readonly sweepBackground = computed(() => {
+    const palette = this.scene().palette;
+    return this.scene().sweepStyle === 'RISE'
+      ? `linear-gradient(to top, ${palette.sweep} 0%, transparent 85%)`
+      : `linear-gradient(105deg, transparent 0%, ${palette.sweep} 50%, transparent 100%)`;
+  });
+
+  /** Scène à rideau montant (Aurora) ? */
+  protected readonly isRise = computed(() => this.scene().sweepStyle === 'RISE');
 }

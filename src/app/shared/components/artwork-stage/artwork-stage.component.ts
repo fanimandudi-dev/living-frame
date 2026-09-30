@@ -31,6 +31,7 @@ import {
 } from '../../models/scene.model';
 import type { LivingScene, SceneIntensity } from '../../models/scene.model';
 import { SceneFxComponent } from '../scene-fx/scene-fx.component';
+import { ParticleFxComponent } from '../particle-fx/particle-fx.component';
 
 /** Événement par défaut : aucune ligne nominative sous le message. */
 const NO_EVENT: EventInfo = { name: '' };
@@ -54,7 +55,7 @@ export const ENGAGED_SLIDE_MS = 6000;
  *   remplacent en fondu (une toutes les `slideMs` ms, en boucle).
  */
 @Component({
-  imports: [SceneFxComponent],
+  imports: [SceneFxComponent, ParticleFxComponent],
   selector: 'lf-artwork-stage',
   templateUrl: './artwork-stage.component.html',
   styleUrl: './artwork-stage.component.scss',

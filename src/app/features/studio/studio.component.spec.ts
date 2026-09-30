@@ -209,6 +209,18 @@ describe('StudioComponent', () => {
     expect(scenario.config().scenario.sceneId).toBe('golden-welcome');
   });
 
+  it('scène — Aurora est enregistrée quand elle est choisie', async () => {
+    const { api } = await createStudio();
+    const scenario = TestBed.inject(ScenarioEngineService);
+    const router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    api.form.controls.sceneId.setValue('aurora');
+    await api.preview(); // enregistre puis navigue
+
+    expect(scenario.config().scenario.sceneId).toBe('aurora');
+  });
+
   it('EF-14 — l’import d’image persist le fichier (via ScenarioEngine.saveImage)', async () => {
     const { fixture, api } = await createStudio();
     const scenario = TestBed.inject(ScenarioEngineService);

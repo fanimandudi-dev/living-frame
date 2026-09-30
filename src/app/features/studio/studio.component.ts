@@ -16,7 +16,7 @@ import { ImageRegistryService } from '../../core/storage/image-registry.service'
 import { DEFAULT_FRAME_CONFIG } from '../../shared/models/frame-config.model';
 import type { FrameConfig } from '../../shared/models/frame-config.model';
 import type { Artwork } from '../../shared/models/artwork.model';
-import { GOLDEN_WELCOME } from '../../shared/models/scene.model';
+import { GOLDEN_WELCOME, SCENES } from '../../shared/models/scene.model';
 import type { SceneIntensity } from '../../shared/models/scene.model';
 
 /**
@@ -47,6 +47,9 @@ export class StudioComponent implements OnInit {
   private readonly registry = inject(ImageRegistryService);
   private readonly kiosk = inject(KioskService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Scènes visuelles proposées au Studio (toutes celles du registre). */
+  protected readonly sceneList = Object.values(SCENES);
 
   /** Bornes de validation des délais (EF-13) — en secondes côté formulaire. */
   private static readonly TIMING_BOUNDS = {
@@ -92,6 +95,7 @@ export class StudioComponent implements OnInit {
       ],
     ],
     // Mise en scène (V1)
+    sceneId: [GOLDEN_WELCOME.id],
     intensity: ['ELEGANT' as SceneIntensity],
   });
 
@@ -269,6 +273,7 @@ export class StudioComponent implements OnInit {
       engageDelayS: config.scenario.engageDelayMs / 1000,
       holdDurationS: config.scenario.holdDurationMs / 1000,
       resetDelayS: config.scenario.resetDelayMs / 1000,
+      sceneId: config.scenario.sceneId ?? GOLDEN_WELCOME.id,
       intensity: config.scenario.intensity ?? 'ELEGANT',
     });
     this.updateMessageValidator(config.scenario.messageEnabled);
@@ -303,7 +308,7 @@ export class StudioComponent implements OnInit {
         holdDurationMs: Math.round(value.holdDurationS * 1000),
         resetDelayMs: Math.round(value.resetDelayS * 1000),
         message: value.message.trim() === '' ? undefined : value.message.trim(),
-        sceneId: GOLDEN_WELCOME.id,
+        sceneId: value.sceneId,
         intensity: value.intensity,
       },
     };
