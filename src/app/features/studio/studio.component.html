@@ -87,6 +87,47 @@
       >
         Utiliser l'œuvre de démonstration
       </button>
+
+      <!-- DÉFILÉ : photos qui se succèdent en fondu pendant la visite -->
+      <div class="studio__parade">
+        <p class="studio__parade-label">
+          Défilé pendant la visite
+          <small>des photos supplémentaires qui se fondent l'une dans l'autre</small>
+        </p>
+        <div class="studio__parade-list">
+          @for (preview of paradePreviews(); track $index; let i = $index) {
+            <div class="studio__parade-item">
+              <img class="studio__thumb" [src]="preview" alt="Photo du défilé n°{{ i + 2 }}" />
+              <button
+                type="button"
+                class="studio__parade-remove"
+                [attr.data-index]="i + 1"
+                (click)="removeParadePhoto(i + 1)"
+                aria-label="Retirer la photo du défilé"
+              >
+                ✕
+              </button>
+            </div>
+          }
+          <label class="studio__drop studio__drop--add">
+            <span class="studio__drop-add">＋</span>
+            <span class="studio__drop-label">Ajouter une photo</span>
+            <input
+              type="file"
+              accept="image/*"
+              class="studio__file-input"
+              data-field="paradeImage"
+              (change)="onParadePhotoSelected($event)"
+            />
+          </label>
+        </div>
+        @if (paradePreviews().length === 0) {
+          <p class="studio__parade-hint">
+            Sans photo supplémentaire, l'œuvre reste sur l'image interactive
+            pendant toute la visite.
+          </p>
+        }
+      </div>
     </section>
 
     <!-- MESSAGE -->

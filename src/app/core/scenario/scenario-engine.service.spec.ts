@@ -4,6 +4,7 @@ import { StorageService } from '../storage/storage.service';
 import { ScenarioEngineService } from './scenario-engine.service';
 import { DEFAULT_FRAME_CONFIG } from '../../shared/models/frame-config.model';
 import type { FrameConfig } from '../../shared/models/frame-config.model';
+import type { LegacyArtwork } from '../../shared/models/artwork.model';
 
 /** Stub systématique des object URLs (voir image-registry.service.spec.ts). */
 function stubObjectUrls(): void {
@@ -24,7 +25,7 @@ function configWithStoredArtwork(): FrameConfig {
   config.artwork = {
     ...config.artwork,
     idleImage: { source: 'stored', key: 'artwork/idle' },
-    engagedImage: { source: 'stored', key: 'artwork/engaged' },
+    engagedImages: [{ source: 'stored', key: 'artwork/engaged' }],
   };
   return config;
 }
@@ -51,6 +52,31 @@ describe('ScenarioEngineService — persistance (fake-indexeddb)', () => {
     await engine.load();
 
     expect(engine.config()).toEqual(DEFAULT_FRAME_CONFIG);
+    expect(engine.persistenceError()).toBeNull();
+  });
+
+  it('migration — une configuration antérieure au défilé (photo unique) devient une séquence', async () => {
+    // Données écrites par une version antérieure au 30/09/2026.
+    const legacyArtwork: LegacyArtwork = {
+      id: 'legacy',
+      name: 'Œuvre ancienne',
+      idleImage: { source: 'asset', path: 'artworks/demo/idle.jpg' },
+      engagedImage: { source: 'asset', path: 'artworks/demo/engaged.jpg' },
+    };
+    const legacyConfig = {
+      ...structuredClone(DEFAULT_FRAME_CONFIG),
+      artwork: legacyArtwork,
+    } as unknown as FrameConfig;
+
+    const storage = new StorageService();
+    await storage.saveConfig(legacyConfig);
+
+    const engine = new ScenarioEngineService(storage, new ImageRegistryService());
+    await engine.load();
+
+    expect(engine.config().artwork.engagedImages).toEqual([
+      { source: 'asset', path: 'artworks/demo/engaged.jpg' },
+    ]);
     expect(engine.persistenceError()).toBeNull();
   });
 

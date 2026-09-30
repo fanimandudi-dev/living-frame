@@ -101,8 +101,16 @@ export class StudioComponent implements OnInit {
   protected readonly idlePreview = computed(() =>
     this.registry.resolve(this.artworkState().idleImage),
   );
+  /** Aperçu de la première photo engagée (celle de la transformation). */
   protected readonly engagedPreview = computed(() =>
-    this.registry.resolve(this.artworkState().engagedImage),
+    this.registry.resolve(this.artworkState().engagedImages[0]),
+  );
+
+  /** Aperçus des photos du défilé (toutes sauf la première). */
+  protected readonly paradePreviews = computed(() =>
+    this.artworkState()
+      .engagedImages.slice(1)
+      .map((ref) => this.registry.resolve(ref)),
   );
 
   /** Avertissement : deux fichiers identiques ne produiront aucun effet (R11). */
@@ -156,9 +164,49 @@ export class StudioComponent implements OnInit {
     // la sauvegarde de la configuration (bouton Enregistrer) viendra ensuite.
     void this.scenario.saveImage(key, file);
     this.selectedFiles.update((files) => ({ ...files, [which]: file }));
+    if (which === 'idle') {
+      this.artworkState.update((artwork) => ({
+        ...artwork,
+        idleImage: { source: 'stored' as const, key },
+      }));
+      return;
+    }
+    // La photo « engagée » est la première du défilé (la transformation).
     this.artworkState.update((artwork) => ({
       ...artwork,
-      [which === 'idle' ? 'idleImage' : 'engagedImage']: { source: 'stored' as const, key },
+      engagedImages: [
+        { source: 'stored' as const, key },
+        ...artwork.engagedImages.slice(1),
+      ],
+    }));
+  }
+
+  /** Ajoute une photo au défilé (photos qui se succèdent pendant la visite). */
+  protected onParadePhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    if (file === null) {
+      return;
+    }
+    const key = `artwork/parade-${Date.now()}`;
+    this.registry.register(key, file);
+    // EF-14 : persistance immédiate du fichier, comme les deux autres.
+    void this.scenario.saveImage(key, file);
+    this.artworkState.update((artwork) => ({
+      ...artwork,
+      engagedImages: [...artwork.engagedImages, { source: 'stored' as const, key }],
+    }));
+    input.value = ''; // permet de re-sélectionner le même fichier
+  }
+
+  /** Retire une photo du défilé (index dans engagedImages — jamais la première). */
+  protected removeParadePhoto(index: number): void {
+    if (index < 1) {
+      return;
+    }
+    this.artworkState.update((artwork) => ({
+      ...artwork,
+      engagedImages: artwork.engagedImages.filter((_, i) => i !== index),
     }));
   }
 

@@ -50,3 +50,14 @@
 ## 5. Prochaine étape — Phase 6 : MediaPipe
 
 Détection locale de présence : `CameraService` (getUserMedia, permissions), packaging **local** du WASM + modèle BlazeFace (le risque R1 — vérifier l'offline avant d'écrire la moindre ligne), `MediaPipeDetectorService` implémentant `DetectionAdapter`, calibration des seuils de distance. Le moteur d'interaction ne changera **pas d'une ligne** — c'est tout l'intérêt du contrat.
+
+
+---
+
+## Évolution (30/09/2026) — migration « défilé »
+
+Le modèle `Artwork` remplace `engagedImage` par une séquence
+`engagedImages`. Les configurations persistées par les versions antérieures
+sont **normalisées à la lecture** (`normalizeArtwork` : photo unique →
+séquence d'un élément) — aucune écriture destructive, la base IndexedDB
+n'est jamais réécrite pour la migration.

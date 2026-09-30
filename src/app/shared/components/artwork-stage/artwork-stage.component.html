@@ -1,6 +1,7 @@
-<!-- Le tableau : deux calques superposés + message. Rien d'autre.
-     Conteneur engagé = opacité (durée pilotée par l'état) ;
-     image intérieure = respiration + chaleur quand l'œuvre est « vivante ». -->
+<!-- Le tableau : calque de repos + photos du défilé empilées + message.
+     Rien d'autre. Conteneur engagé = opacité (durée pilotée par l'état) ;
+     photos empilées = défilé en fondu (celle portant .current est visible) ;
+     toutes respirent ensemble quand l'œuvre est « vivante ». -->
 <div class="stage" [class.message-on]="messageVisible()">
   <img class="stage__img" [src]="idleSrc()" [alt]="artwork().name" />
 
@@ -10,7 +11,14 @@
     [style.opacity]="engagedOpacity()"
     [style.transition-duration.ms]="fadeMs()"
   >
-    <img class="stage__img stage__img--engaged" [src]="engagedSrc()" alt="" />
+    @for (src of engagedSrcs(); track $index) {
+      <img
+        class="stage__img stage__img--engaged"
+        [class.current]="$index === photoIndex()"
+        [src]="src"
+        alt=""
+      />
+    }
   </div>
 
   <p class="stage__message" [class.visible]="messageVisible()">

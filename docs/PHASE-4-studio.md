@@ -57,3 +57,15 @@
 ## 5. Prochaine étape — Phase 5 : Persistance (IndexedDB)
 
 `StorageService` (config + blobs images), amorçage des défauts, migrations (`version: 1`), replis (quota, base indisponible) — le `ImageRegistry` s'adosse à la base, `ScenarioEngine.load/save` persiste vraiment. Critère CA-09 : redémarrage → configuration intacte.
+
+
+---
+
+## Évolution (30/09/2026) — défilé de photos
+
+La section Œuvre du Studio gère désormais un **défilé** : au-delà de l'image
+initiale et de l'image interactive (la transformation), l'organisateur peut
+ajouter des photos supplémentaires (bouton « Ajouter une photo », retrait par
+✕). Elles se fondent l'une dans l'autre pendant que le visiteur regarde.
+Persistance immédiate de chaque fichier via `ScenarioEngine.saveImage`
+(clé `artwork/parade-<horodatage>`), comme les deux autres images (EF-14).

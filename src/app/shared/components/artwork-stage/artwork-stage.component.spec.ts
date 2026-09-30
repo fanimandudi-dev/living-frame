@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import type { ComponentFixture } from '@angular/core/testing';
 import { DEFAULT_FRAME_CONFIG } from '../../models/frame-config.model';
 import type { Scenario } from '../../models/scenario.model';
@@ -18,6 +19,7 @@ describe('ArtworkStageComponent', () => {
     distance: 'FAR' | 'NEAR' | 'VERY_NEAR' | null = null,
     scenarioOverride: Partial<Scenario> = {},
     event: { name: string } = { name: '' },
+    slideMs?: number,
   ): ComponentFixture<ArtworkStageComponent> {
     const fixture = TestBed.createComponent(ArtworkStageComponent);
     fixture.componentRef.setInput('state', state);
@@ -28,6 +30,9 @@ describe('ArtworkStageComponent', () => {
       ...scenarioOverride,
     });
     fixture.componentRef.setInput('event', event);
+    if (slideMs !== undefined) {
+      fixture.componentRef.setInput('slideMs', slideMs);
+    }
     fixture.detectChanges();
     return fixture;
   }
@@ -90,6 +95,48 @@ describe('ArtworkStageComponent', () => {
   it('sans nom d’événement : pas de ligne nominative', () => {
     const element = stageOf(createStage('ENGAGED'));
     expect(element.querySelector('.stage__event')).toBeNull();
+  });
+
+  it('défilé : les photos sont empilées, la première est courante (ENGAGED)', () => {
+    const element = stageOf(createStage('ENGAGED'));
+    const imgs = element.querySelectorAll<HTMLImageElement>('.stage__img--engaged');
+    expect(imgs.length).toBe(4); // œuvre de démonstration : transformation + 3 photos
+    expect(imgs[0].classList.contains('current')).toBe(true);
+    expect(imgs[1].classList.contains('current')).toBe(false);
+  });
+
+  it('défilé : passe à la photo suivante après la cadence', async () => {
+    const fixture = createStage('ENGAGED', null, {}, undefined, 30);
+    const element = stageOf(fixture);
+    const imgs = () => element.querySelectorAll<HTMLImageElement>('.stage__img--engaged');
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(imgs()[1].classList.contains('current')).toBe(true);
+    });
+  });
+
+  it('défilé : au repos (IDLE), les photos ne défilent pas', async () => {
+    const fixture = createStage('IDLE', null, {}, undefined, 30);
+    const element = stageOf(fixture);
+    await new Promise((resolve) => setTimeout(resolve, 90));
+    fixture.detectChanges();
+    const imgs = element.querySelectorAll<HTMLImageElement>('.stage__img--engaged');
+    expect(imgs[0].classList.contains('current')).toBe(true);
+  });
+
+  it('défilé : retour à la première photo quand l’œuvre repose', async () => {
+    const fixture = createStage('ENGAGED', null, {}, undefined, 30);
+    const element = stageOf(fixture);
+    const imgs = () => element.querySelectorAll<HTMLImageElement>('.stage__img--engaged');
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(imgs()[1].classList.contains('current')).toBe(true);
+    });
+    fixture.componentRef.setInput('state', 'IDLE');
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(imgs()[0].classList.contains('current')).toBe(true);
+    });
   });
 
   it('message désactivé : aucun message affiché en HOLD', () => {

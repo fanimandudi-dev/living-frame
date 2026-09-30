@@ -24,6 +24,8 @@ function stubObjectUrls(): void {
 function protectedApi(component: StudioComponent): {
   form: InstanceType<typeof StudioComponent>['form'];
   onImageSelected(which: 'idle' | 'engaged', event: Event): void;
+  onParadePhotoSelected(event: Event): void;
+  removeParadePhoto(index: number): void;
   identicalFiles(): boolean;
   useDemoArtwork(): void;
   preview(): Promise<void>;
@@ -31,6 +33,8 @@ function protectedApi(component: StudioComponent): {
   return component as unknown as {
     form: InstanceType<typeof StudioComponent>['form'];
     onImageSelected(which: 'idle' | 'engaged', event: Event): void;
+    onParadePhotoSelected(event: Event): void;
+    removeParadePhoto(index: number): void;
     identicalFiles(): boolean;
     useDemoArtwork(): void;
     preview(): Promise<void>;
@@ -151,6 +155,27 @@ describe('StudioComponent', () => {
     api.onImageSelected('engaged', fileEvent(file));
 
     expect(api.identicalFiles()).toBe(true);
+  });
+
+  it('défilé — ajoute puis retire une photo supplémentaire (persistance immédiate)', async () => {
+    const { component, api } = await createStudio();
+    const scenario = TestBed.inject(ScenarioEngineService);
+    const saveImageSpy = vi.spyOn(scenario, 'saveImage').mockResolvedValue(undefined);
+    const before = component['artworkState']().engagedImages.length; // 4 (démo)
+
+    api.onParadePhotoSelected(fileEvent(new File(['x'], 'p2.jpg', { type: 'image/jpeg' })));
+    await Promise.resolve(); // microtask du void saveImage
+
+    expect(component['artworkState']().engagedImages.length).toBe(before + 1);
+    expect(component['artworkState']().engagedImages[before].source).toBe('stored');
+    expect(saveImageSpy).toHaveBeenCalled();
+
+    api.removeParadePhoto(1);
+    expect(component['artworkState']().engagedImages.length).toBe(before);
+
+    // La photo de transformation (index 0) n'est jamais retirée.
+    api.removeParadePhoto(0);
+    expect(component['artworkState']().engagedImages.length).toBe(before);
   });
 
   it('« Utiliser l’œuvre de démonstration » restaure l’œuvre embarquée', async () => {

@@ -74,6 +74,25 @@ système manquait de caractère. Corrections :
 - **Ligne nominative** : le nom de l'événement (Studio) s'affiche en capitales
   espacées sous le message — la personnalisation vient de la configuration.
 
+## 4ter. Défilé de photos pendant la visite (30/09/2026)
+
+La présence tenue révélait une pauvreté : une fois la transformation vue,
+il ne se passait plus rien tant que la personne restait. Désormais l'œuvre
+engage une **séquence** de photos (`Artwork.engagedImages`) :
+
+- la **première** porte la transformation (fondu repos → engagé) ;
+- les **suivantes** se remplacent en fondu artisanal (1,6 s), une toutes les
+  `ENGAGED_SLIDE_MS` (6 s), **en boucle**, tant que la personne est présente ;
+- au retour au repos, le défilé repart de la première photo : chaque nouvelle
+  visite retrouve l'effet complet depuis le début (mono-passe préservé) ;
+- le défilé vit dans le **renderer** (scène) — le moteur d'interaction ne
+  connaît pas les photos, l'architecture CAM→ENGINE→SCENARIO→RENDERER tient ;
+- migration douce : les configurations persistées avant cette évolution
+  (photo unique) sont normalisées à la lecture (`normalizeArtwork`).
+
+L'œuvre de démonstration embarque 4 photos générées d'après la paire
+initiale (même couple, même cadrage, même lumière).
+
 ## 5. Prochaine étape — Phase 4 : Studio
 
 Formulaire complet (événement, œuvre, message, timings, activations) branché sur `ScenarioEngineService.save()` — TEST-04 complet. La persistance IndexedDB suit en Phase 5.

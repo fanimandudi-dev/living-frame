@@ -42,6 +42,13 @@ npm test              # tests unitaires (vitest)
 npm run verify:pwa    # 19 contrôles offline du build (à lancer avant déploiement)
 ```
 
+## Fonctionnement
+
+Détection de présence locale → transformation progressive de l'œuvre →
+message personnalisé ; **présence tenue** : l'œuvre reste animée et fait
+**défiler plusieurs photos** tant que quelqu'un regarde, puis revient au
+repos à son départ (une salutation par approche).
+
 ## Stack
 
 Angular 22 · TypeScript strict · Angular Signals · SCSS · composants standalone ·

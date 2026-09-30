@@ -9,6 +9,7 @@ import type { ScriptStep } from './scripted-detector.service';
  *   t+0,8 s  entrée (FAR)      → présence confirmée à ~1,4 s → APPROACH
  *   t+2,6 s  approche (NEAR)   → ENGAGED (délai + proximité réunis)
  *   t+5 s    HOLD              → message visible (plancher minimal 5 s)
+ *   t+11 s   défilé            → 2ᵉ photo (cadence 6 s tant que présent)
  *   t+14 s   départ            → le message a persisté tant que la personne était là
  *   t+15,2 s RESET             → absence confirmée → fondu de retour
  *   t+17,2 s IDLE              → réarmement, puis le script reboucle

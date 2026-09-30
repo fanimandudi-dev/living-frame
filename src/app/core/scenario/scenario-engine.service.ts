@@ -5,6 +5,7 @@ import { ImageRegistryService } from '../storage/image-registry.service';
 import { StorageService } from '../storage/storage.service';
 import { DEFAULT_FRAME_CONFIG } from '../../shared/models/frame-config.model';
 import type { FrameConfig } from '../../shared/models/frame-config.model';
+import { normalizeArtwork } from '../../shared/models/artwork.model';
 import type { Artwork } from '../../shared/models/artwork.model';
 
 /**
@@ -57,10 +58,14 @@ export class ScenarioEngineService {
     try {
       const stored = await this.storage.loadConfig();
       if (stored !== null) {
+        // Migration douce : les configurations antérieures au défilé
+        // (30/09/2026) n'ont qu'une photo engagée — on les normalise
+        // en séquence, sans jamais réécrire la base.
+        const artwork = normalizeArtwork(stored.artwork);
         // D'abord les object URLs (pour que la config publiée s'affiche d'emblée),
         // ensuite la configuration.
-        await this.hydrateImages(stored.artwork);
-        this._config.set(stored);
+        await this.hydrateImages(artwork);
+        this._config.set({ ...stored, artwork });
       }
       this.persistenceError.set(null);
     } catch {
@@ -112,7 +117,7 @@ export class ScenarioEngineService {
   /** Réenregistre dans le registre les object URLs des images stockées. */
   private async hydrateImages(artwork: Artwork): Promise<void> {
     await Promise.all(
-      [artwork.idleImage, artwork.engagedImage].map(async (ref) => {
+      [artwork.idleImage, ...artwork.engagedImages].map(async (ref) => {
         if (ref.source !== 'stored') {
           return;
         }

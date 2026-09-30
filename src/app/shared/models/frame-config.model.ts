@@ -36,7 +36,14 @@ export const DEFAULT_FRAME_CONFIG: FrameConfig = {
     id: 'demo-couple',
     name: 'Portrait des mariés — démonstration',
     idleImage: { source: 'asset', path: 'artworks/demo/idle.jpg' },
-    engagedImage: { source: 'asset', path: 'artworks/demo/engaged.jpg' },
+    // Défilé : la première photo porte la transformation, les suivantes
+    // apparaissent en fondu pendant que la personne regarde.
+    engagedImages: [
+      { source: 'asset', path: 'artworks/demo/engaged.jpg' },
+      { source: 'asset', path: 'artworks/demo/engaged-2.jpg' },
+      { source: 'asset', path: 'artworks/demo/engaged-3.jpg' },
+      { source: 'asset', path: 'artworks/demo/engaged-4.jpg' },
+    ],
   },
   scenario: {
     id: 'welcome',

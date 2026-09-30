@@ -58,10 +58,11 @@
     -webkit-user-drag: none;
   }
 
-  // --- FONDU ARTISANAL ---------------------------------------------------
-  // Le conteneur porte l'opacité (durée pilotée selon l'état) ; l'image
-  // intérieure porte la respiration (échelle) et la chaleur (filtre) :
-  // deux transitions indépendantes, donc aucune interférence de durée.
+  // --- FONDU ARTISANAL + DÉFILÉ -------------------------------------------
+  // Le conteneur porte l'opacité globale (durée pilotée selon l'état) ; les
+  // photos du défilé sont empilées : celle portant .current est visible.
+  // Toutes respirent ensemble (transform/filter communs), donc le fondu
+  // entre photos n'interfère jamais avec la respiration.
   &__engaged {
     position: absolute;
     inset: 0;
@@ -72,12 +73,18 @@
     will-change: opacity;
 
     .stage__img {
+      opacity: 0;
       transform: scale(1);
       filter: brightness(1) saturate(1);
       transition:
+        opacity 1600ms cubic-bezier(0.45, 0, 0.25, 1),
         transform 2600ms cubic-bezier(0.3, 0, 0.2, 1),
         filter 2600ms ease;
-      will-change: transform;
+      will-change: opacity, transform;
+    }
+
+    .stage__img.current {
+      opacity: 1;
     }
 
     // ENGAGED / HOLD : l'œuvre respire lentement, sa lumière se réchauffe.
@@ -85,6 +92,7 @@
       transform: scale(1.045);
       filter: brightness(1.045) saturate(1.07) sepia(0.05);
       transition:
+        opacity 1600ms cubic-bezier(0.45, 0, 0.25, 1),
         transform 9000ms cubic-bezier(0.3, 0, 0.2, 1),
         filter 3200ms ease;
     }
