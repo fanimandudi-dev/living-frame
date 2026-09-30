@@ -52,8 +52,9 @@ L'œuvre de démonstration incluse permet de tester sans vos propres photos.
 ### Le défilé (optionnel)
 
 Vous pouvez ajouter **plusieurs photos** en plus de l'image interactive :
-pendant que le visiteur regarde, elles se fondent doucement l'une dans
-l'autre, comme un album qui se raconte. Dans le Studio, section Œuvre,
+pendant que le visiteur regarde, elles apparaissent comme une encre qui
+diffuse, comme un album qui se raconte — et le déroulé change un peu à
+chaque visite. Dans le Studio, section Œuvre,
 utilisez « Ajouter une photo » (et le ✕ pour retirer). Prenez-les si
 possible dans la même séance, avec le même cadrage et la même lumière.
 

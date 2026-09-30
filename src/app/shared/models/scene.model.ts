@@ -130,3 +130,68 @@ export const SCENES: Record<string, LivingScene> = {
   [GOLDEN_WELCOME.id]: GOLDEN_WELCOME,
   [AURORA.id]: AURORA,
 };
+
+// ---------------------------------------------------------------------------
+// VARIATIONS DE CHORÉGRAPHIE (Étape C, 30/09/2026)
+//
+// PROBLÈME : rejouer exactement la même scène à chaque visite tue l'illusion
+// au troisième passage. DÉCISION : trois déroulés qui partagent la grammaire
+// de la scène (calme → lumière → halo → message) mais varient le RYTHME.
+// La variation tourne à chaque nouvelle visite (jamais deux visites
+// identiques d'affilée) — pure transformation des phases, testée.
+// ---------------------------------------------------------------------------
+
+export type SceneVariationId = 'CLASSIC' | 'LIGHT_FIRST' | 'SLOW_BLOOM';
+
+export interface SceneVariationInfo {
+  id: SceneVariationId;
+  label: string;
+  description: string;
+}
+
+/** Les variations, dans l'ordre de rotation. */
+export const SCENE_VARIATIONS: readonly SceneVariationInfo[] = [
+  { id: 'CLASSIC', label: 'Classique', description: 'le déroulé de la scène, tel quel' },
+  { id: 'LIGHT_FIRST', label: 'Lumière d’abord', description: 'énergique — la lumière devance tout' },
+  { id: 'SLOW_BLOOM', label: 'Éclosion lente', description: 'contemplatif — tout s’étire' },
+];
+
+/** Arrondi à 100 ms — les phases restent lisibles et prévisibles. */
+function round100(ms: number): number {
+  return Math.max(100, Math.round(ms / 100) * 100);
+}
+
+/**
+ * Phases d'une scène selon la variation — transformation PURE des phases
+ * de base : la scène garde son identité (palette, style), seul le rythme
+ * change.
+ */
+export function variationPhases(
+  base: ScenePhases,
+  variation: SceneVariationId,
+): ScenePhases {
+  switch (variation) {
+    case 'CLASSIC':
+      return { ...base };
+    case 'LIGHT_FIRST':
+      return {
+        calmMs: round100(base.calmMs * 0.5),
+        sweepAtMs: round100(base.sweepAtMs * 0.5),
+        sweepMs: round100(base.sweepMs * 0.85),
+        glowAtMs: round100(base.sweepAtMs * 0.5 + base.sweepMs * 0.2),
+        glowMs: round100(base.glowMs * 0.85),
+        messageAtMs: round100(base.messageAtMs * 0.72),
+        eventAtMs: round100(base.eventAtMs * 0.72),
+      };
+    case 'SLOW_BLOOM':
+      return {
+        calmMs: round100(base.calmMs * 2),
+        sweepAtMs: round100(base.calmMs * 2 + base.sweepAtMs * 0.2),
+        sweepMs: round100(base.sweepMs * 1.7),
+        glowAtMs: round100(base.calmMs * 2 + base.glowAtMs * 0.6),
+        glowMs: round100(base.glowMs * 1.5),
+        messageAtMs: round100(base.messageAtMs * 1.35),
+        eventAtMs: round100(base.eventAtMs * 1.35),
+      };
+  }
+}

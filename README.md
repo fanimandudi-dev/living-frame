@@ -66,6 +66,7 @@ sans identification ni stockage d'images.
 - `docs/GUIDE-organisateur.md` — guide client : installation, préparation, jour J, dépannage
 - `docs/V1-01-moteur-de-scenes.md` — chorégraphie GSAP, scène Golden Welcome, intensités
 - `docs/V1-02-aurora-et-particules.md` — scène Aurora, particules PixiJS, garde CDN
+- `docs/V1-03-variations-et-encre.md` — variations de chorégraphie, transitions d'encre
 - `docs/PHASE-9-prototype-physique.md` — intégration physique, check-list de démonstration, limites V0
 
 ## Livrable

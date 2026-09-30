@@ -139,6 +139,37 @@ describe('ArtworkStageComponent', () => {
     });
   });
 
+  it('variations — la 2ᵉ visite joue un déroulé différent (rythme)', () => {
+    const fixture = createStage('ENGAGED');
+    const component = fixture.componentInstance as unknown as {
+      activeScene(): { phases: { messageAtMs: number } };
+    };
+    const base = component.activeScene().phases; // 1ʳᵉ visite : Classique
+
+    fixture.componentRef.setInput('state', 'IDLE');
+    fixture.detectChanges();
+    fixture.componentRef.setInput('state', 'ENGAGED');
+    fixture.detectChanges();
+    const second = component.activeScene().phases; // 2ᵉ : Lumière d'abord
+    expect(second.messageAtMs).toBeLessThan(base.messageAtMs);
+
+    fixture.componentRef.setInput('state', 'RESET');
+    fixture.detectChanges();
+    fixture.componentRef.setInput('state', 'ENGAGED');
+    fixture.detectChanges();
+    const third = component.activeScene().phases; // 3ᵉ : Éclosion lente
+    expect(third.messageAtMs).toBeGreaterThan(base.messageAtMs);
+  });
+
+  it('encre — chaque photo du défilé porte une origine d’éclosion cyclique', () => {
+    const element = stageOf(createStage('ENGAGED'));
+    const imgs = element.querySelectorAll<HTMLElement>('.stage__img--engaged');
+    expect(imgs[0].classList.contains('ink-a')).toBe(true);
+    expect(imgs[1].classList.contains('ink-b')).toBe(true);
+    expect(imgs[2].classList.contains('ink-c')).toBe(true);
+    expect(imgs[3].classList.contains('ink-a')).toBe(true);
+  });
+
   it('message désactivé : aucun message affiché en HOLD', () => {
     const element = stageOf(createStage('HOLD', null, { messageEnabled: false }));
     expect(element.querySelector<HTMLElement>('.stage__message')?.classList.contains('visible')).toBe(

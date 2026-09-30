@@ -16,6 +16,9 @@
       <img
         class="stage__img stage__img--engaged"
         [class.current]="$index === photoIndex()"
+        [class.ink-a]="$index % 3 === 0"
+        [class.ink-b]="$index % 3 === 1"
+        [class.ink-c]="$index % 3 === 2"
         [src]="src"
         alt=""
       />
@@ -27,7 +30,7 @@
     [state]="state()"
     [distance]="distance()"
     [intensity]="intensity()"
-    [scene]="scene()"
+    [scene]="activeScene()"
   />
 
   <lf-particle-fx
@@ -35,7 +38,7 @@
     [state]="state()"
     [distance]="distance()"
     [intensity]="intensity()"
-    [scene]="scene()"
+    [scene]="activeScene()"
   />
 
   <p class="stage__message" [class.visible]="messageVisible()">

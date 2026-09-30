@@ -28,6 +28,8 @@ import {
   GOLDEN_WELCOME,
   INTENSITY_PRESETS,
   SCENES,
+  SCENE_VARIATIONS,
+  variationPhases,
 } from '../../models/scene.model';
 import type { LivingScene, SceneIntensity } from '../../models/scene.model';
 import { SceneFxComponent } from '../scene-fx/scene-fx.component';
@@ -82,6 +84,12 @@ export class ArtworkStageComponent {
   /** Index de la photo du défilé actuellement affichée. */
   protected readonly photoIndex = signal(0);
 
+  /** Index de la variation en cours — démarre avant la première pour que
+   *  la 1ʳᵉ visite joue « Classique », puis la rotation avance. */
+  private readonly variationIndex = signal(SCENE_VARIATIONS.length - 1);
+  /** Front montant de présence de la visite précédente (détection de bord). */
+  private lastAlive = false;
+
   /** Cibles de la chorégraphie du message (références de template). */
   private readonly messageTextRef = viewChild<ElementRef<HTMLElement>>('messageTextEl');
   private readonly eventLineRef = viewChild<ElementRef<HTMLElement>>('eventLineEl');
@@ -99,6 +107,19 @@ export class ArtworkStageComponent {
   protected readonly intensity = computed<SceneIntensity>(
     () => this.scenario().intensity ?? 'ELEGANT',
   );
+
+  /**
+   * Scène réellement jouée : la scène choisie, dont les PHASES sont
+   * réécrites par la variation de la visite en cours (Étape C). La
+   * palette et le style restent ceux de la scène — seul le rythme varie.
+   */
+  protected readonly activeScene = computed<LivingScene>(() => {
+    const variation = SCENE_VARIATIONS[this.variationIndex()];
+    return {
+      ...this.scene(),
+      phases: variationPhases(this.scene().phases, variation.id),
+    };
+  });
 
   constructor() {
     // Préchargement de TOUTES les photos du défilé dès que la séquence
@@ -123,10 +144,17 @@ export class ArtworkStageComponent {
       onCleanup(() => clearInterval(id));
     });
 
-    // Au repos, le défilé repart de la première photo (la transformation) :
-    // chaque nouvelle visite retrouve l'effet complet depuis le début.
+    // VISITES : au front montant de présence, la variation de chorégraphie
+    // avance (Classique → Lumière d'abord → Éclosion lente → …) ; au repos,
+    // le défilé repart de la première photo — chaque visite retrouve l'effet
+    // complet, mais jamais deux fois le même rythme.
     effect(() => {
-      if (!this.isAlive()) {
+      const alive = this.isAlive();
+      if (alive && !this.lastAlive) {
+        this.variationIndex.update((i) => (i + 1) % SCENE_VARIATIONS.length);
+      }
+      this.lastAlive = alive;
+      if (!alive) {
         this.photoIndex.set(0);
       }
     });
@@ -148,7 +176,7 @@ export class ArtworkStageComponent {
           textEl,
           eventEl,
           INTENSITY_PRESETS[this.intensity()],
-          this.scene(),
+          this.activeScene(),
         );
       } else if (this.messageShown) {
         this.messageAnim?.kill();
