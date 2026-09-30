@@ -28,7 +28,7 @@ describe('PreviewComponent', () => {
     (element.querySelector('[data-state="ENGAGED"]') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(engine.state()).toBe('ENGAGED');
-    expect(element.querySelector<HTMLElement>('.stage__img--engaged')?.style.opacity).toBe('1');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('1');
   });
 
   it('Réinitialiser → IDLE et réarmé (T13)', () => {

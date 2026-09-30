@@ -1,12 +1,22 @@
-<!-- Le tableau : deux calques superposés + message. Rien d'autre. -->
-<div class="stage">
+<!-- Le tableau : deux calques superposés + message. Rien d'autre.
+     Conteneur engagé = opacité (durée pilotée par l'état) ;
+     image intérieure = respiration + chaleur quand l'œuvre est « vivante ». -->
+<div class="stage" [class.message-on]="messageVisible()">
   <img class="stage__img" [src]="idleSrc()" [alt]="artwork().name" />
-  <img
-    class="stage__img stage__img--engaged"
-    [src]="engagedSrc()"
-    alt=""
+
+  <div
+    class="stage__engaged"
+    [class.alive]="isAlive()"
     [style.opacity]="engagedOpacity()"
     [style.transition-duration.ms]="fadeMs()"
-  />
-  <p class="stage__message" [class.visible]="messageVisible()">{{ messageText() }}</p>
+  >
+    <img class="stage__img stage__img--engaged" [src]="engagedSrc()" alt="" />
+  </div>
+
+  <p class="stage__message" [class.visible]="messageVisible()">
+    <span class="stage__message-text">{{ messageText() }}</span>
+    @if (eventLine() !== '') {
+      <span class="stage__event">{{ eventLine() }}</span>
+    }
+  </p>
 </div>

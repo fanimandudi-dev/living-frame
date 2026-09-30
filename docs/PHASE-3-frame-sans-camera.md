@@ -56,6 +56,24 @@
 | CA-03 (anti-rebond) | ✅ automatisé | 2 tests : présence brève, absence brève |
 | Table T1–T13 | ✅ automatisé | 13 tests couvrent chaque ligne de la table validée en Phase 1 |
 
+## 4bis. Affinage du rendu (30/09/2026) — fondu artisanal & typographie
+
+Retour d'expérience du prototype : le fondu croisé « à plat » (easing générique,
+paliers d'opacité discrets) faisait double-exposition, et le message en police
+système manquait de caractère. Corrections :
+
+- **Fondu** : courbe `cubic-bezier(0.45, 0, 0.25, 1)` (départ lent, pose douce),
+  fondus d'approche 600 → 1400 ms (les trois paliers se fondent en flot continu) ;
+- **Respiration** : en ENGAGED/HOLD, l'image engagée zoote très lentement
+  (+4,5 % sur 9 s) et sa lumière se réchauffe légèrement (`filter`) — l'œuvre
+  vit, ce n'est plus un échange d'images. Opacité sur le conteneur, respiration
+  sur l'image : deux transitions indépendantes ;
+- **Typographie** : Cormorant Garamond italique **embarquée** (2 sous-ensembles
+  woff2, 30 Ko, licence SIL OFL — offline) ; le message naît flou/espacé puis se
+  pose (keyframes) ; voile de lisibilité apparaissant avec lui ;
+- **Ligne nominative** : le nom de l'événement (Studio) s'affiche en capitales
+  espacées sous le message — la personnalisation vient de la configuration.
+
 ## 5. Prochaine étape — Phase 4 : Studio
 
 Formulaire complet (événement, œuvre, message, timings, activations) branché sur `ScenarioEngineService.save()` — TEST-04 complet. La persistance IndexedDB suit en Phase 5.

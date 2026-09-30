@@ -45,7 +45,8 @@ npm run verify:pwa    # 19 contrôles offline du build (à lancer avant déploie
 ## Stack
 
 Angular 22 · TypeScript strict · Angular Signals · SCSS · composants standalone ·
-MediaPipe Tasks Vision (WASM + modèle auto-hébergés — zéro CDN) · IndexedDB · PWA.
+MediaPipe Tasks Vision (WASM + modèle auto-hébergés — zéro CDN) · IndexedDB · PWA ·
+Cormorant Garamond (SIL OFL, embarquée).
 
 Aucun backend. Aucune donnée ne quitte l'appareil : la détection est locale,
 sans identification ni stockage d'images.

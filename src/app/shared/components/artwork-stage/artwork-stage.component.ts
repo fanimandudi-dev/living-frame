@@ -18,17 +18,26 @@ import type {
 } from '../../../core/interaction/interaction-state';
 import type { Artwork } from '../../models/artwork.model';
 import type { Scenario } from '../../models/scenario.model';
+import type { EventInfo } from '../../models/frame-config.model';
+
+/** Événement par défaut : aucune ligne nominative sous le message. */
+const NO_EVENT: EventInfo = { name: '' };
 
 /**
  * SCÈNE D'ŒUVRE — le rendu du « tableau vivant », partagé par le Frame
  * (plein écran) et le Preview (pilotage manuel).
  *
- * Composant de PRÉSENTATION pur : il reçoit (état, distance, œuvre, scénario)
- * et les traduit en opacités et message. Aucune décision, aucun timer,
+ * Composant de PRÉSENTATION pur : il reçoit (état, distance, œuvre, scénario,
+ * événement) et les traduit en visuel. Aucune décision, aucun timer,
  * aucune connaissance du capteur — tout le comportement est dans le moteur.
  *
- * Toute l'illusion tient dans un calque d'image à opacité pilotée,
- * animé uniquement via `opacity` (compositing GPU, 60 fps — ENF-P2).
+ * Le rendu « artisanal » (affinage du 30/09/2026) :
+ * - fondu d'opacité à courbe douce (cubic-bezier), durée pilotée par l'état ;
+ * - en ENGAGED/HOLD, l'œuvre RESPIRE : zoom très lent (+4,5 %) et lumière
+ *   légèrement réchauffée — elle vit, ce n'est plus un échange d'image ;
+ * - le message naît en Cormorant Garamond italique : il émerge flou et
+ *   espacé puis se pose, avec le voile de lisibilité et la ligne nominative
+ *   de l'événement en capitales espacées.
  */
 @Component({
   selector: 'lf-artwork-stage',
@@ -47,6 +56,8 @@ export class ArtworkStageComponent {
   readonly artwork = input.required<Artwork>();
   /** Scénario actif : toggles, message, délais. */
   readonly scenario = input.required<Scenario>();
+  /** Métadonnées de l'événement — la ligne nominative sous le message. */
+  readonly event = input<EventInfo>(NO_EVENT);
 
   constructor() {
     // Préchargement du calque engagé dès que sa source change : évite le
@@ -66,6 +77,12 @@ export class ArtworkStageComponent {
   protected readonly engagedSrc = computed(() =>
     this.registry.resolve(this.artwork().engagedImage),
   );
+
+  /** ENGAGED / HOLD : l'œuvre « vit » (respiration lente + chaleur). */
+  protected readonly isAlive = computed(() => {
+    const state = this.state();
+    return state === 'ENGAGED' || state === 'HOLD';
+  });
 
   /**
    * Opacité du calque engagé — cœur de l'illusion :
@@ -113,4 +130,7 @@ export class ArtworkStageComponent {
       this.messageText() !== '' &&
       (this.state() === 'ENGAGED' || this.state() === 'HOLD'),
   );
+
+  /** Ligne nominative : le nom de l'événement, en capitales espacées. */
+  protected readonly eventLine = computed(() => this.event().name.trim());
 }

@@ -17,11 +17,11 @@
       }
     },
     {
-      "name": "oeuvres",
+      "name": "oeuvres-et-polices",
       "installMode": "prefetch",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/artworks/**", "/icons/**"]
+        "files": ["/artworks/**", "/icons/**", "/fonts/**"]
       }
     },
     {

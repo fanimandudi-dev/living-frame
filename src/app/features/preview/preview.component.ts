@@ -80,6 +80,8 @@ export class PreviewComponent implements OnInit {
 
   protected readonly artwork = computed(() => this.scenario.config().artwork);
   protected readonly scenarioCfg = computed(() => this.scenario.config().scenario);
+  /** Métadonnées de l'événement — ligne nominative sous le message. */
+  protected readonly event = computed(() => this.scenario.config().event);
 
   // ------------------------------------------------------------- commandes
 

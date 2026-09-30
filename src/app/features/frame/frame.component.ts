@@ -113,6 +113,8 @@ export class FrameComponent implements OnInit, OnDestroy {
 
   protected readonly artwork = computed(() => this.scenario.config().artwork);
   protected readonly scenarioCfg = computed(() => this.scenario.config().scenario);
+  /** Métadonnées de l'événement — ligne nominative sous le message. */
+  protected readonly event = computed(() => this.scenario.config().event);
 
   // ------------------------------------------------------- kiosque (Ph. 9)
 

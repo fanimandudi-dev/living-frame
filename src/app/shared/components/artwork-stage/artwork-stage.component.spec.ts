@@ -12,11 +12,12 @@ describe('ArtworkStageComponent', () => {
     }).compileComponents();
   });
 
-  /** Crée la scène dans un état donné, avec surcharges de scénario optionnelles. */
+  /** Crée la scène dans un état donné, avec surcharges optionnelles. */
   function createStage(
     state: FrameState,
     distance: 'FAR' | 'NEAR' | 'VERY_NEAR' | null = null,
     scenarioOverride: Partial<Scenario> = {},
+    event: { name: string } = { name: '' },
   ): ComponentFixture<ArtworkStageComponent> {
     const fixture = TestBed.createComponent(ArtworkStageComponent);
     fixture.componentRef.setInput('state', state);
@@ -26,6 +27,7 @@ describe('ArtworkStageComponent', () => {
       ...DEFAULT_FRAME_CONFIG.scenario,
       ...scenarioOverride,
     });
+    fixture.componentRef.setInput('event', event);
     fixture.detectChanges();
     return fixture;
   }
@@ -42,12 +44,12 @@ describe('ArtworkStageComponent', () => {
     expect(
       element.querySelector<HTMLImageElement>('.stage__img--engaged')?.getAttribute('src'),
     ).toContain('engaged.jpg');
-    expect(element.querySelector<HTMLElement>('.stage__img--engaged')?.style.opacity).toBe('0');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('0');
   });
 
   it('ENGAGED : calque engagé à pleine opacité + message visible', () => {
     const element = stageOf(createStage('ENGAGED'));
-    expect(element.querySelector<HTMLElement>('.stage__img--engaged')?.style.opacity).toBe('1');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('1');
     const message = element.querySelector<HTMLElement>('.stage__message');
     expect(message?.classList.contains('visible')).toBe(true);
     expect(message?.textContent).toContain('Bienvenue dans notre histoire');
@@ -55,14 +57,39 @@ describe('ArtworkStageComponent', () => {
 
   it('APPROACH : l’opacité suit la distance (0.55 en NEAR)', () => {
     const element = stageOf(createStage('APPROACH', 'NEAR'));
-    expect(element.querySelector<HTMLElement>('.stage__img--engaged')?.style.opacity).toBe('0.55');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('0.55');
   });
 
   it('transformation désactivée : le calque engagé reste invisible', () => {
     const element = stageOf(
       createStage('ENGAGED', null, { transformationEnabled: false }),
     );
-    expect(element.querySelector<HTMLElement>('.stage__img--engaged')?.style.opacity).toBe('0');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('0');
+  });
+
+  it('ENGAGED : l’œuvre est « vivante » (classe alive — respiration/chaleur)', () => {
+    const element = stageOf(createStage('ENGAGED'));
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.classList.contains('alive')).toBe(
+      true,
+    );
+  });
+
+  it('IDLE : pas de classe alive (l’œuvre repose)', () => {
+    const element = stageOf(createStage('IDLE'));
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.classList.contains('alive')).toBe(
+      false,
+    );
+  });
+
+  it('ligne nominative : le nom de l’événement s’affiche sous le message', () => {
+    const element = stageOf(createStage('ENGAGED', null, {}, { name: 'Aline & Marc' }));
+    const eventLine = element.querySelector<HTMLElement>('.stage__event');
+    expect(eventLine?.textContent).toContain('Aline & Marc');
+  });
+
+  it('sans nom d’événement : pas de ligne nominative', () => {
+    const element = stageOf(createStage('ENGAGED'));
+    expect(element.querySelector('.stage__event')).toBeNull();
   });
 
   it('message désactivé : aucun message affiché en HOLD', () => {

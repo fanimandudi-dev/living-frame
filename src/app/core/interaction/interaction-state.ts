@@ -57,5 +57,6 @@ export const APPROACH_OPACITY: Readonly<Record<DistanceLevel, number>> = {
   VERY_NEAR: 0.85,
 };
 
-/** Durée des petits fondus entre niveaux de distance pendant APPROACH. */
-export const APPROACH_FADE_MS = 600;
+/** Durée des fondus entre niveaux de distance pendant APPROACH — assez lente
+ * pour que les trois paliers se fondent en un flot continu. */
+export const APPROACH_FADE_MS = 1400;

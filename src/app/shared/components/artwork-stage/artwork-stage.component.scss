@@ -11,6 +11,27 @@
   overflow: hidden;
   background: #0c0c0d;
 
+  // Voile de lisibilité sous le message — apparaît et disparaît avec lui.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(6, 6, 7, 0.46) 0%,
+      rgba(6, 6, 7, 0.15) 18%,
+      transparent 34%
+    );
+    opacity: 0;
+    transition: opacity 1300ms ease;
+  }
+
+  &.message-on::before {
+    opacity: 1;
+  }
+
   // Vignette discrète : un cadrage sombre aux bords, comme sous verre —
   // de la profondeur, pas de la décoration.
   &::after {
@@ -37,35 +58,105 @@
     -webkit-user-drag: none;
   }
 
-  // Calque engagé : toute la magie est un fondu d'opacité (GPU).
-  &__img--engaged {
+  // --- FONDU ARTISANAL ---------------------------------------------------
+  // Le conteneur porte l'opacité (durée pilotée selon l'état) ; l'image
+  // intérieure porte la respiration (échelle) et la chaleur (filtre) :
+  // deux transitions indépendantes, donc aucune interférence de durée.
+  &__engaged {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
     opacity: 0;
-    transition: opacity 2000ms ease;
+    transition: opacity 2000ms cubic-bezier(0.45, 0, 0.25, 1);
     will-change: opacity;
+
+    .stage__img {
+      transform: scale(1);
+      filter: brightness(1) saturate(1);
+      transition:
+        transform 2600ms cubic-bezier(0.3, 0, 0.2, 1),
+        filter 2600ms ease;
+      will-change: transform;
+    }
+
+    // ENGAGED / HOLD : l'œuvre respire lentement, sa lumière se réchauffe.
+    &.alive .stage__img {
+      transform: scale(1.045);
+      filter: brightness(1.045) saturate(1.07) sepia(0.05);
+      transition:
+        transform 9000ms cubic-bezier(0.3, 0, 0.2, 1),
+        filter 3200ms ease;
+    }
   }
 
+  // --- MESSAGE ------------------------------------------------------------
   &__message {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 9%;
+    bottom: 8.5%;
     z-index: 3;
     margin: 0;
     padding: 0 2rem;
     text-align: center;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-style: italic;
-    font-size: clamp(1.4rem, 3.2vw, 2.6rem);
-    letter-spacing: 0.06em;
-    color: #f3ead9;
-    text-shadow: 0 1px 24px rgba(0, 0, 0, 0.55);
     opacity: 0;
-    transition: opacity 900ms ease;
+    transition: opacity 650ms cubic-bezier(0.4, 0, 1, 1); // sortie : douce, immédiate
 
-    // Apparition retardée : le message naît APRÈS la transformation (EF-09).
     &.visible {
       opacity: 1;
-      transition: opacity 900ms ease 800ms;
+      // entrée : après la transformation, tout en douceur
+      transition: opacity 1400ms cubic-bezier(0.3, 0.6, 0.2, 1) 900ms;
     }
+  }
+
+  &__message-text {
+    display: block;
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.6rem, 3.6vw, 3rem);
+    letter-spacing: 0.14em;
+    line-height: 1.35;
+    color: #f5ecdc;
+    text-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.55),
+      0 2px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  // Ligne nominative : le nom de l'événement, en capitales espacées.
+  &__event {
+    display: block;
+    margin-top: 1.15rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+    text-transform: uppercase;
+    letter-spacing: 0.45em;
+    text-indent: 0.45em; // recentrage visuel
+    color: rgba(233, 223, 201, 0.82);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: opacity 600ms ease; // sortie immédiate
+  }
+}
+
+// Naissance du message : il émerge flou et espacé, puis se pose.
+// (de `from` vers les styles naturels — la fin = l'état de repos, donc
+// aucune rupture visuelle à la disparition de l'animation)
+.stage__message.visible .stage__message-text {
+  animation: stage-message-in 1700ms cubic-bezier(0.2, 0.6, 0.2, 1) 900ms both;
+}
+
+// La ligne nominative entre en second, une fois le message posé.
+.stage__message.visible .stage__event {
+  opacity: 1;
+  transition: opacity 1000ms ease 2000ms;
+}
+
+@keyframes stage-message-in {
+  from {
+    letter-spacing: 0.34em;
+    transform: translateY(18px);
+    filter: blur(10px);
   }
 }

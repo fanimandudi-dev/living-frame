@@ -33,7 +33,7 @@ describe('FrameComponent', () => {
 
     expect(idle?.getAttribute('src')).toContain('idle.jpg');
     expect(engaged?.getAttribute('src')).toContain('engaged.jpg');
-    expect(engaged?.style.opacity).toBe('0');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('0');
   });
 
   it('TEST-04 — le message configuré s’affiche en ENGAGED, calque engagé visible', async () => {
@@ -55,9 +55,7 @@ describe('FrameComponent', () => {
     const message = element.querySelector<HTMLElement>('.stage__message');
     expect(message?.textContent).toContain('Bienvenue chez les Martin');
     expect(message?.classList.contains('visible')).toBe(true);
-    expect(element.querySelector<HTMLImageElement>('.stage__img--engaged')?.style.opacity).toBe(
-      '1',
-    );
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('1');
   });
 
   it('transformation désactivée → le calque engagé reste invisible', async () => {
@@ -75,9 +73,7 @@ describe('FrameComponent', () => {
     engine.forceState('ENGAGED');
     fixture.detectChanges();
     const element: HTMLElement = fixture.nativeElement;
-    expect(
-      element.querySelector<HTMLElement>('.stage__img--engaged')?.style.opacity,
-    ).toBe('0');
+    expect(element.querySelector<HTMLElement>('.stage__engaged')?.style.opacity).toBe('0');
   });
 
   it('message désactivé → aucun message visible en HOLD', async () => {
